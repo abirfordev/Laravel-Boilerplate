@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('alumnis', function (Blueprint $table) {
             $table->id();
             $table->string('student_id')->unique();
+            $table->string('type')->nullable()->default('Alumni');
             $table->string('name')->nullable();
             $table->string('father_name')->nullable();
             $table->string('mother_name')->nullable();

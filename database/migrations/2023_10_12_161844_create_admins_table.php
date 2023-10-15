@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('admins', function (Blueprint $table) {
             $table->id();
+            $table->string('type')->nullable()->default('Admin');
             $table->string('name')->nullable();
             $table->string('email')->unique();
             $table->string('mobile')->nullable();

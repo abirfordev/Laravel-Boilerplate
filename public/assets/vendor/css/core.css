@@ -14723,7 +14723,7 @@ body {
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  margin: 0;
+  margin-top: 10px;
   padding: 0;
   height: 100%;
 }
@@ -14731,7 +14731,7 @@ body {
 .menu-inner-shadow {
   display: none;
   position: absolute;
-  top: 4.225rem;
+  top: 5.225rem;
   height: 3rem;
   width: 100%;
   pointer-events: none;
@@ -15444,8 +15444,8 @@ html:not(.layout-footer-fixed) .content-wrapper {
 }
 
 .menu-vertical .app-brand {
-  padding-right: 2rem;
-  padding-left: 2rem;
+  padding-right: 0.2rem;
+  padding-left: 0.2rem;
 }
 
 .menu-horizontal .app-brand,

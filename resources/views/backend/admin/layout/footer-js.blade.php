@@ -11,9 +11,28 @@
 
 <!-- Vendors JS -->
 <script src="{{ asset('/assets/vendor/libs/apex-charts/apexcharts.js') }}"></script>
+<script src="{{ asset('/assets/vendor/libs/datatables/datatables.js') }}"></script>
+<script src="{{ asset('/assets/vendor/libs/bootstarp-image-upload/bootstrap-imageupload.min.js') }}"></script>
+<script src="{{ asset('/assets/vendor/libs/sweetalert2/sweetalert2.all.min.js') }}"></script>
 
 <!-- Main JS -->
 <script src="{{ asset('/assets/js/main.js') }}"></script>
 
 <!-- Page JS -->
+
+{{-- Dashboard analytics --}}
 <script src="{{ asset('/assets/js/dashboards-analytics.js') }}"></script>
+
+{{-- Pages Account Setting --}}
+{{-- <script src="{{ asset('/assets/js/pages-account-settings-account.js') }}"></script> --}}
+
+{{-- Bootstrap image upload --}}
+<script src="{{ asset('/assets/js/bootstarp-image-upload.js') }}"></script>
+
+{{-- AJAX Submit --}}
+<script src="{{ asset('/assets/js/submit-alert.js') }}"></script>
+
+{{-- JQuery form validation --}}
+<script src="{{ asset('/assets/js/jquery.validate.min.js') }}"></script>
+
+<!--/ Page JS -->

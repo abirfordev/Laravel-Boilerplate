@@ -40,6 +40,20 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
+
+        'user' => [
+            'driver' => 'session',
+            'provider' => 'users',
+        ],
+
+        'alumni' => [
+            'driver' => 'session',
+            'provider' => 'alumnis',
+        ],
     ],
 
     /*
@@ -63,6 +77,15 @@ return [
         'users' => [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
+        ],
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
+        ],
+
+        'alumnis' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Alumni::class,
         ],
 
         // 'users' => [
@@ -93,6 +116,20 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'admins' => [
+            'provider' => 'admins',
+            'table' => 'password_reset_tokens',
+            'expire' => 60,
+            'throttle' => 60,
+        ],
+
+        'alumnis' => [
+            'provider' => 'alumnis',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,
