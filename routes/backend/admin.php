@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('dashboard', 'DashboardController@index')->name('dashboard');
+// Route::get('activity-log', 'ActivityLogController@index')->name('activity.log');
 
 Route::group(
     [
@@ -19,3 +20,4 @@ Route::group(
     }
 );
 Route::resource('settings/admin', 'AdminController');
+Route::get('settings/activity-log', 'ActivityLogController@index')->name('settings.activity-log');
