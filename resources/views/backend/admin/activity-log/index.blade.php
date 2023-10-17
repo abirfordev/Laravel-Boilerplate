@@ -32,22 +32,10 @@
                                 Export all data
                             </a>
                         </li>
-                        <li>
-                            <a href="#" class="dropdown-item">
-                                Export filtered data
-                            </a>
-                        </li>
+                        
                     </ul>
                 </div>
-                <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
-                    <i class='bx bx-plus me-1'></i>
-                    <span class="d-none d-sm-block">Add New Record</span>
-                </button>
-
-                <a href="{{ route('admin.settings.admin.trash') }}" class="btn rounded-pill btn-outline-danger mt-1 me-1">
-                    <i class='bx bx-trash me-1'></i>
-                    <span class="d-none d-sm-block">Trash</span>
-                </a>
+                
             </div> --}}
             {{-- / Export and Add new Button --}}
 
@@ -89,8 +77,8 @@
                         <tr>
                             <th></th>
                             <th>#</th>
-                            <th>Type</th>
-                            <th>Name</th>
+                            <th>Type of User</th>
+                            <th>Name of User</th>
                             <th>Log Name</th>
                             <th>Description</th>
                             <th>Date & time</th>
@@ -212,33 +200,5 @@
         });
     </script>
 
-
-    {{-- <script type="text/javascript">
-        function create() {
-            create_form_modal('/admin/settings/admin');
-        }
-
-        $(document).ready(function() {
-
-            // View Form
-            $("#base-table").on("click", ".view", function() {
-                var id = $(this).attr('id');
-                view_modal('/admin/settings/admin', id)
-            });
-
-            // Edit Form
-            $("#base-table").on("click", ".edit", function() {
-                var id = $(this).attr('id');
-                edit_form_modal('/admin/settings/admin', id)
-            });
-
-            // Delete
-            $("#base-table").on("click", ".delete", function() {
-                var id = $(this).attr('id');
-                soft_delete('/admin/settings/admin', id)
-            });
-
-        });
-    </script> --}}
 
 @endsection
