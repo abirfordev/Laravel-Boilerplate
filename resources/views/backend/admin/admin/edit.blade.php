@@ -11,14 +11,14 @@
     </div>
     <div class="col-12 col-md-6 my-1">
         <label class="form-label" for="email">Email <span class="text-danger">*</span></label>
-        <input id="email" class="form-control" type="email" name="email" required value={{ $admin->email }}
+        <input id="email" class="form-control" type="email" name="email" required value="{{ $admin->email }}"
             placeholder="Enter email">
         <span id="error_email" class="text-danger error"></span>
     </div>
 
     <div class="col-12 col-md-6 my-1">
         <label class="form-label" for="mobile">Mobile No <span class="text-danger">*</span></label>
-        <input id="mobile" class="form-control" type="text" name="mobile" required value={{ $admin->mobile }}
+        <input id="mobile" class="form-control" type="text" name="mobile" required value="{{ $admin->mobile }}"
             placeholder="Enter mobile no">
         <span id="error_mobile" class="text-danger error"></span>
     </div>

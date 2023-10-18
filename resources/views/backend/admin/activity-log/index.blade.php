@@ -71,7 +71,7 @@
             <!--/ Search Form -->
 
             {{-- Table --}}
-            <div class="card-datatable table-responsive">
+            <div class="card-datatable table-responsive mt-3">
                 <table class="table border-top" id="base-table">
                     <thead>
                         <tr>

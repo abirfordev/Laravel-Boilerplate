@@ -3,8 +3,9 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('dashboard', 'DashboardController@index')->name('dashboard');
-// Route::get('activity-log', 'ActivityLogController@index')->name('activity.log');
 
+
+// Routes for Admin
 Route::group(
     [
         'controller' => 'AdminController',
@@ -20,4 +21,11 @@ Route::group(
     }
 );
 Route::resource('settings/admin', 'AdminController');
-Route::get('settings/activity-log', 'ActivityLogController@index')->name('settings.activity-log');
+// --/ Routes for Admin
+
+// Routes for Activity Log
+Route::get('web-settings/activity-log', 'ActivityLogController@index')->name('web-settings.activity-log');
+// --/ Routes for Activity Log
+
+// Routes for Setting
+Route::resource('web-settings/setting', 'SettingController');
