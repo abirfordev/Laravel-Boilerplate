@@ -24,6 +24,11 @@ function create_form_modal(route) {
     });
 }
 
+function clear_filter() {
+    let url = $(location).attr("href");
+    window.location.href = url.split("?")[0];
+}
+
 /* RESTfull store data*/
 
 function store_data(route) {
@@ -406,7 +411,7 @@ function permanent_delete_single(route, id) {
         preConfirm: (t) =>
             $.ajax({
                 url: route + "/" + id,
-                type: "GET",
+                type: "DELETE",
                 headers: {
                     "X-CSRF-TOKEN": CSRF_TOKEN,
                 },
@@ -464,7 +469,7 @@ function permanent_delete_selected(route, ids) {
             preConfirm: (t) =>
                 $.ajax({
                     url: route + "/" + ids,
-                    type: "GET",
+                    type: "DELETE",
                     headers: {
                         "X-CSRF-TOKEN": CSRF_TOKEN,
                     },

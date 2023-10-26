@@ -1,8 +1,8 @@
 @extends('backend.admin.layout.master')
-@section('title', 'Module')
+@section('title', 'Permission')
 @section('nav-icon-title')
-    <i class='fa-solid fa-list m-2'></i>
-    <p class="m-0 p-0">Module</p>
+    <i class="fa-solid fa-person-circle-exclamation m-2"></i>
+    <p class="m-0 p-0">Permission</p>
 @endsection
 
 @section('content')
@@ -11,7 +11,7 @@
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb breadcrumb-style2 mb-0">
-                <li class="breadcrumb-item active">Module</li>
+                <li class="breadcrumb-item active">Permission</li>
             </ol>
         </nav>
         <!--/ Breadcrumb -->
@@ -43,21 +43,16 @@
                     <i class='bx bx-plus me-1'></i>
                     <span class="d-none d-sm-block">Add New Record</span>
                 </button>
-
-                <a href="{{ route('admin.settings.module.trash') }}" class="btn rounded-pill btn-outline-danger mt-1 me-1">
-                    <i class='bx bx-trash me-1'></i>
-                    <span class="d-none d-sm-block">Trash</span>
-                </a>
             </div>
             {{-- / Export and Add new Button --}}
 
             <!--Search Form -->
             <div class="card-body">
-                <form id="search_module" action="" method="GET">
+                <form id="search_category" action="" method="GET">
                     <div class="row justify-content-center g-3">
                         <div class="col-12 col-md-4">
 
-                            <input type="text" class="form-control" placeholder="Type module name" id="name"
+                            <input type="text" class="form-control" placeholder="Type permission name" id="name"
                                 name="name" @isset($name) value="{{ $name }}" @endisset>
                         </div>
 
@@ -78,19 +73,25 @@
                         <tr>
                             <th></th>
                             <th>#</th>
-                            <th>Module Name</th>
-                            <th>Permission Slug</th>
+                            <th>Permission Name</th>
+                            <th>Module</th>
+                            <th>Label</th>
+                            <th>Visible to Role</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($modules as $key => $data)
+                        @foreach ($permissions as $key => $data)
                             <tr>
                                 <td></td>
-                                <td>{{ $key + 1 + ($modules->currentPage() - 1) * $modules->perPage() }}</td>
+                                <td>{{ $key + 1 + ($permissions->currentPage() - 1) * $permissions->perPage() }}</td>
                                 <td>{{ $data->name }}</td>
-                                <td>{{ $data->permission_slug }}</td>
+                                <td>{{ $data->module->name }}</td>
+                                <td>{{ $data->label }}</td>
+                                <td><span
+                                        class="badge rounded-pill {{ $data->is_visibile_to_role ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->is_visibile_to_role ? 'Yes' : 'No' }}</span>
+                                </td>
 
                                 <td><span
                                         class="badge rounded-pill {{ $data->status ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->status ? 'Active' : 'Inactive' }}</span>
@@ -101,7 +102,7 @@
                                     <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
                                         class='bx bx-edit text-success edit' title="Edit"></i>
                                     <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-trash text-warning delete' title="Delete"></i>
+                                        class='bx bx-trash text-danger delete' title="Delete"></i>
                                 </td>
 
 
@@ -114,15 +115,15 @@
                 </table>
                 {{-- Info --}}
                 <div class="d-flex justify-content-center m-3 text-muted">
-                    @if (count($modules) > 0)
-                        Showing {{ $modules->firstItem() }} to {{ $modules->lastItem() }} of
-                        {{ $modules->total() }} entries
+                    @if (count($permissions) > 0)
+                        Showing {{ $permissions->firstItem() }} to {{ $permissions->lastItem() }} of
+                        {{ $permissions->total() }} entries
                     @endif
                 </div>
 
                 {{-- Pagination --}}
                 <div class="d-flex justify-content-center">
-                    {!! $modules->links() !!}
+                    {!! $permissions->links() !!}
                 </div>
             </div>
             {{-- / Table --}}
@@ -213,7 +214,7 @@
 
     <script type="text/javascript">
         function create() {
-            create_form_modal('/admin/settings/module');
+            create_form_modal('/admin/settings/permission');
         }
 
         $(document).ready(function() {
@@ -221,20 +222,20 @@
             // View Form
             $("#base-table").on("click", ".view", function() {
                 var id = $(this).attr('id');
-                view_modal('/admin/settings/module', id)
+                view_modal('/admin/settings/permission', id)
             });
 
             // Edit Form
             $("#base-table").on("click", ".edit", function() {
                 var id = $(this).attr('id');
-                edit_form_modal('/admin/settings/module', id)
+                edit_form_modal('/admin/settings/permission', id)
             });
 
 
             // Delete
             $("#base-table").on("click", ".delete", function() {
                 var id = $(this).attr('id');
-                soft_delete('/admin/settings/module', id)
+                permanent_delete_single('/admin/settings/permission', id)
             });
 
         });

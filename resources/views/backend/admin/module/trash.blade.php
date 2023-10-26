@@ -43,21 +43,18 @@
 
             <!--Search Form -->
             <div class="card-body">
-                <form class="d-flex justify-content-center" id="search_module" action="" method="GET">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="row g-3">
-                                <div class="col-12 col-sm-8 col-lg-8">
+                <form id="search_module" action="" method="GET">
+                    <div class="row justify-content-center g-3">
+                        <div class="col-12 col-md-4">
 
-                                    <input type="text" class="form-control" placeholder="Type module name" id="name"
-                                        name="name"
-                                        @isset($name) value="{{ $name }}" @endisset>
-                                </div>
+                            <input type="text" class="form-control" placeholder="Type module name" id="name"
+                                name="name" @isset($name) value="{{ $name }}" @endisset>
+                        </div>
 
-                                <div class="col-md-1">
-                                    <button class="btn btn-primary" type="submit">Filter</button>
-                                </div>
-                            </div>
+                        <div class="col-12 col-md-4">
+                            <button id="clear" class="btn btn-outline-secondary" type="button"
+                                onclick="clear_filter()">Clear</button>
+                            <button class="btn btn-primary" type="submit">Filter</button>
                         </div>
                     </div>
                 </form>

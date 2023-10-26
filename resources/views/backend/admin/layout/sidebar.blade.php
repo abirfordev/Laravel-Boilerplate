@@ -38,6 +38,13 @@
                         <div data-i18n="Module">Module</div>
                     </a>
                 </li>
+
+                <li class="menu-item {{ request()->is('admin/settings/permission*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.permission.index') }}" class="menu-link">
+                        <div data-i18n="Permission">Permission</div>
+                    </a>
+                </li>
+
                 <li class="menu-item {{ request()->is('admin/settings/admin*') ? 'active' : '' }}">
                     <a href="{{ route('admin.admin.index') }}" class="menu-link">
                         <div data-i18n="Admin">Admin</div>
