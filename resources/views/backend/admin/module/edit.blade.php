@@ -22,7 +22,7 @@
         <span id="error_permission_slug" class="text-danger error"></span>
     </div>
 
-    <div class="col-12 col-md-6 form-check my-1">
+    <div class="col-12 col-md-4 form-check my-1">
         <input id="is_children" class="form-check-input" type="checkbox" name="is_children"
             {{ $module->is_children ? 'checked' : '' }} />
         <label class="form-check-label" for="is_children">
@@ -31,13 +31,22 @@
         <span id="error_is_children" class="text-danger error"></span>
     </div>
 
-    <div class="col-12 col-md-6 form-check my-1">
+    <div class="col-12 col-md-4 form-check my-1">
         <input id="is_label" class="form-check-input" type="checkbox" name="is_label"
             {{ $module->is_label ? 'checked' : '' }} />
         <label class="form-check-label" for="is_label">
             Label
         </label>
         <span id="error_is_label" class="text-danger error"></span>
+    </div>
+
+    <div class="col-12 col-md-4 form-check my-1">
+        <input id="is_visibile_to_role" class="form-check-input" type="checkbox" name="is_visibile_to_role"
+            {{ $module->is_visibile_to_role ? 'checked' : '' }} />
+        <label class="form-check-label" for="is_visibile_to_role">
+            Visible to Role
+        </label>
+        <span id="error_is_visibile_to_role" class="text-danger error"></span>
     </div>
 
     <div class="col-12 col-md-12 my-1 children_property" style="{{ $module->is_children ? '' : 'display:none' }}">

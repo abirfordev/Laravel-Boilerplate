@@ -41,6 +41,15 @@
                 </tr>
 
                 <tr>
+                    <th>Visible to Role</th>
+                    <td>
+                        <span
+                            class="badge rounded-pill {{ $module->is_visibile_to_role ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $module->is_visibile_to_role ? 'Yes' : 'No' }}
+                        </span>
+                    </td>
+                </tr>
+
+                <tr>
                     <th>Status</th>
 
                     <td><span

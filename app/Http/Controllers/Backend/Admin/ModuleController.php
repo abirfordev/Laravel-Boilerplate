@@ -73,6 +73,7 @@ class ModuleController extends Controller
                     $module->permission_slug = $request->input('permission_slug');
                     $module->is_children = $request->has('is_children') ? 1 : 0;;
                     $module->is_label = $request->has('is_label') ? 1 : 0;
+                    $module->is_visibile_to_role = $request->has('is_visibile_to_role') ? 1 : 0;
                     $module->parent_module_id =
                         $request->has('is_children') ? $request->input('parent_module_id') : null;
 
@@ -148,6 +149,7 @@ class ModuleController extends Controller
                     $module->permission_slug = $request->input('permission_slug');
                     $module->is_children = $request->has('is_children') ? 1 : 0;;
                     $module->is_label = $request->has('is_label') ? 1 : 0;
+                    $module->is_visibile_to_role = $request->has('is_visibile_to_role') ? 1 : 0;
                     $module->parent_module_id =
                         $request->has('is_children') ? $request->input('parent_module_id') : null;
 

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('permission_slug')->unique();
             $table->tinyInteger('is_label')->nullable();
             $table->tinyInteger('is_children')->nullable();
+            $table->tinyInteger('is_visibile_to_role')->nullable();
             $table->unsignedBigInteger('parent_module_id')->nullable();
             $table->tinyInteger('status')->default(1)->nullable();
             $table->timestamps();
