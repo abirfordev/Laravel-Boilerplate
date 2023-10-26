@@ -1,8 +1,8 @@
 @extends('backend.admin.layout.master')
-@section('title', 'Admin')
+@section('title', 'Module')
 @section('nav-icon-title')
-    <i class="fa-solid fa-user-gear m-2"></i>
-    <p class="m-0 p-0">Admin</p>
+    <i class='fa-solid fa-list m-2'></i>
+    <p class="m-0 p-0">Module</p>
 @endsection
 
 @section('content')
@@ -11,7 +11,7 @@
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb breadcrumb-style2 mb-0">
-                <li class="breadcrumb-item active">Admin</li>
+                <li class="breadcrumb-item active">Module</li>
             </ol>
         </nav>
         <!--/ Breadcrumb -->
@@ -44,7 +44,7 @@
                     <span class="d-none d-sm-block">Add New Record</span>
                 </button>
 
-                <a href="{{ route('admin.settings.admin.trash') }}" class="btn rounded-pill btn-outline-danger mt-1 me-1">
+                <a href="{{ route('admin.settings.module.trash') }}" class="btn rounded-pill btn-outline-danger mt-1 me-1">
                     <i class='bx bx-trash me-1'></i>
                     <span class="d-none d-sm-block">Trash</span>
                 </a>
@@ -53,26 +53,18 @@
 
             <!--Search Form -->
             <div class="card-body">
-                <form class="d-flex justify-content-center" id="search_admin" action="" method="GET">
+                <form class="d-flex justify-content-center" id="search_category" action="" method="GET">
                     <div class="row">
                         <div class="col-12">
                             <div class="row g-3">
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-sm-8 col-lg-8">
 
-                                    <input type="text" class="form-control" placeholder="Type name" id="name"
+                                    <input type="text" class="form-control" placeholder="Type module name" id="name"
                                         name="name"
                                         @isset($name) value="{{ $name }}" @endisset>
                                 </div>
 
-                                <div class="col-12 col-md-4">
-
-                                    <input type="text" class="form-control" placeholder="Type email" id="email"
-                                        name="email"
-                                        @isset($email) value="{{ $email }}" @endisset>
-                                </div>
-
-
-                                <div class="col-12 col-md-4">
+                                <div class="col-md-1">
                                     <button class="btn btn-primary" type="submit">Filter</button>
                                 </div>
                             </div>
@@ -89,31 +81,19 @@
                         <tr>
                             <th></th>
                             <th>#</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Mobile</th>
-                            <th>Image</th>
-                            <th>gender</th>
+                            <th>Module Name</th>
+                            <th>Permission Slug</th>
                             <th>Status</th>
                             <th>Action</th>
-
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($admins as $key => $data)
+                        @foreach ($modules as $key => $data)
                             <tr>
                                 <td></td>
-                                <td>{{ $key + 1 + ($admins->currentPage() - 1) * $admins->perPage() }}</td>
+                                <td>{{ $key + 1 + ($modules->currentPage() - 1) * $modules->perPage() }}</td>
                                 <td>{{ $data->name }}</td>
-                                <td>{{ $data->email }}</td>
-                                <td>{{ $data->mobile }}</td>
-                                <td>
-                                    <div class="avatar avatar-md">
-                                        <img src="{{ asset($data->image) }}" alt="Avatar"
-                                            class="rounded img-fluid img-thumbnail">
-                                    </div>
-                                </td>
-                                <td>{{ $data->gender }}</td>
+                                <td>{{ $data->permission_slug }}</td>
 
                                 <td><span
                                         class="badge rounded-pill {{ $data->status ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->status ? 'Active' : 'Inactive' }}</span>
@@ -126,6 +106,10 @@
                                     <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
                                         class='bx bx-trash text-warning delete' title="Delete"></i>
                                 </td>
+
+
+
+
                             </tr>
                         @endforeach
                     </tbody>
@@ -133,15 +117,15 @@
                 </table>
                 {{-- Info --}}
                 <div class="d-flex justify-content-center m-3 text-muted">
-                    @if (count($admins) > 0)
-                        Showing {{ $admins->firstItem() }} to {{ $admins->lastItem() }} of
-                        {{ $admins->total() }} entries
+                    @if (count($modules) > 0)
+                        Showing {{ $modules->firstItem() }} to {{ $modules->lastItem() }} of
+                        {{ $modules->total() }} entries
                     @endif
                 </div>
 
                 {{-- Pagination --}}
                 <div class="d-flex justify-content-center">
-                    {!! $admins->links() !!}
+                    {!! $modules->links() !!}
                 </div>
             </div>
             {{-- / Table --}}
@@ -230,10 +214,9 @@
         });
     </script>
 
-
     <script type="text/javascript">
         function create() {
-            create_form_modal('/admin/settings/admin');
+            create_form_modal('/admin/settings/module');
         }
 
         $(document).ready(function() {
@@ -241,19 +224,20 @@
             // View Form
             $("#base-table").on("click", ".view", function() {
                 var id = $(this).attr('id');
-                view_modal('/admin/settings/admin', id)
+                view_modal('/admin/settings/module', id)
             });
 
             // Edit Form
             $("#base-table").on("click", ".edit", function() {
                 var id = $(this).attr('id');
-                edit_form_modal('/admin/settings/admin', id)
+                edit_form_modal('/admin/settings/module', id)
             });
+
 
             // Delete
             $("#base-table").on("click", ".delete", function() {
                 var id = $(this).attr('id');
-                soft_delete('/admin/settings/admin', id)
+                soft_delete('/admin/settings/module', id)
             });
 
         });

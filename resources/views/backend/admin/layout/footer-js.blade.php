@@ -14,6 +14,7 @@
 <script src="{{ asset('/assets/vendor/libs/datatables/datatables.js') }}"></script>
 <script src="{{ asset('/assets/vendor/libs/bootstarp-image-upload/bootstrap-imageupload.min.js') }}"></script>
 <script src="{{ asset('/assets/vendor/libs/sweetalert2/sweetalert2.all.min.js') }}"></script>
+<script src="{{ asset('/assets/vendor/libs/select2/select2.min.js') }}"></script>
 
 <!-- Main JS -->
 <script src="{{ asset('/assets/js/main.js') }}"></script>

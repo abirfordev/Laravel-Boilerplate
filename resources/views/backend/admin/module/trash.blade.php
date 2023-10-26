@@ -1,8 +1,8 @@
 @extends('backend.admin.layout.master')
-@section('title', 'Admin')
+@section('title', 'Trash Module')
 @section('nav-icon-title')
-    <i class="fa-solid fa-user-gear m-2"></i>
-    <p class="m-0 p-0">Admin</p>
+    <i class='fa-solid fa-list m-2'></i>
+    <p class="m-0 p-0">Trash Module</p>
 @endsection
 
 @section('content')
@@ -11,68 +11,50 @@
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb breadcrumb-style2 mb-0">
-                <li class="breadcrumb-item active">Admin</li>
+
+                <li class="breadcrumb-item">
+                    <a href="{{ route('admin.module.index') }}">Module</a>
+                </li>
+                <li class="breadcrumb-item active">Trash</li>
             </ol>
         </nav>
         <!--/ Breadcrumb -->
 
+
+
         <!-- DataTable with Buttons -->
         <div class="card">
-            {{-- Export and Add new Button --}}
-            <div class="d-flex flex-wrap justify-content-end mt-2">
-                <div class="btn-group" id="dropdown-icon-demo">
-                    <button type="button" class="btn rounded-pill btn-outline-info dropdown-toggle mt-1 me-1"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bx bxs-file-export me-1"></i>
-                        <span class="d-none d-sm-block">Export</span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="#" class="dropdown-item">
-                                Export all data
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="dropdown-item">
-                                Export filtered data
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
-                    <i class='bx bx-plus me-1'></i>
-                    <span class="d-none d-sm-block">Add New Record</span>
+            {{-- Restore and Remove Button --}}
+            <div class="d-flex flex-wrap justify-content-end my-3">
+
+                <button class="btn rounded-pill btn-primary restore_selected mt-1 me-1" type="button">
+                    <i class='bx bxs-direction-left me-1'></i>
+                    <span class="d-none d-sm-block">Restore Selected</span>
                 </button>
 
-                <a href="{{ route('admin.settings.admin.trash') }}" class="btn rounded-pill btn-outline-danger mt-1 me-1">
-                    <i class='bx bx-trash me-1'></i>
-                    <span class="d-none d-sm-block">Trash</span>
-                </a>
+                <button class="btn rounded-pill btn-outline-danger remove_selected mt-1 me-1" type="button">
+                    <i class='fa-solid fa-ban me-1'></i>
+                    <span class="d-none d-sm-block">Remove Selected</span>
+                </button>
+
+
             </div>
-            {{-- / Export and Add new Button --}}
+            {{-- / Restore and Remove Button --}}
 
             <!--Search Form -->
             <div class="card-body">
-                <form class="d-flex justify-content-center" id="search_admin" action="" method="GET">
+                <form class="d-flex justify-content-center" id="search_module" action="" method="GET">
                     <div class="row">
                         <div class="col-12">
                             <div class="row g-3">
-                                <div class="col-12 col-md-4">
+                                <div class="col-12 col-sm-8 col-lg-8">
 
-                                    <input type="text" class="form-control" placeholder="Type name" id="name"
+                                    <input type="text" class="form-control" placeholder="Type module name" id="name"
                                         name="name"
                                         @isset($name) value="{{ $name }}" @endisset>
                                 </div>
 
-                                <div class="col-12 col-md-4">
-
-                                    <input type="text" class="form-control" placeholder="Type email" id="email"
-                                        name="email"
-                                        @isset($email) value="{{ $email }}" @endisset>
-                                </div>
-
-
-                                <div class="col-12 col-md-4">
+                                <div class="col-md-1">
                                     <button class="btn btn-primary" type="submit">Filter</button>
                                 </div>
                             </div>
@@ -82,50 +64,45 @@
             </div>
             <!--/ Search Form -->
 
+
             {{-- Table --}}
             <div class="card-datatable table-responsive">
                 <table class="table border-top" id="base-table">
                     <thead>
                         <tr>
                             <th></th>
+                            <th></th>
                             <th>#</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Mobile</th>
-                            <th>Image</th>
-                            <th>gender</th>
+                            <th>Module Name</th>
+                            <th>Permission Slug</th>
                             <th>Status</th>
                             <th>Action</th>
 
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($admins as $key => $data)
+                        @foreach ($modules as $key => $data)
                             <tr>
                                 <td></td>
-                                <td>{{ $key + 1 + ($admins->currentPage() - 1) * $admins->perPage() }}</td>
-                                <td>{{ $data->name }}</td>
-                                <td>{{ $data->email }}</td>
-                                <td>{{ $data->mobile }}</td>
-                                <td>
-                                    <div class="avatar avatar-md">
-                                        <img src="{{ asset($data->image) }}" alt="Avatar"
-                                            class="rounded img-fluid img-thumbnail">
-                                    </div>
+                                <td>{{ $data->id }}</td>
+                                <td>{{ $key + 1 + ($modules->currentPage() - 1) * $modules->perPage() }}
+                                    <input type="hidden" name="id" value="{{ $data->id }}" />
                                 </td>
-                                <td>{{ $data->gender }}</td>
+                                <td>{{ $data->name }}</td>
+                                <td>{{ $data->permission_slug }}</td>
 
                                 <td><span
                                         class="badge rounded-pill {{ $data->status ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->status ? 'Active' : 'Inactive' }}</span>
                                 </td>
                                 <td>
                                     <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-show text-primary view' title="View"></i>
+                                        class='bx bxs-direction-left text-primary restore' title="Restore"></i>
                                     <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-edit text-success edit' title="Edit"></i>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-trash text-warning delete' title="Delete"></i>
+                                        class='fa-solid fa-ban text-danger permanentDelete' title="Permanent Delete"></i>
+
                                 </td>
+
+
                             </tr>
                         @endforeach
                     </tbody>
@@ -133,15 +110,15 @@
                 </table>
                 {{-- Info --}}
                 <div class="d-flex justify-content-center m-3 text-muted">
-                    @if (count($admins) > 0)
-                        Showing {{ $admins->firstItem() }} to {{ $admins->lastItem() }} of
-                        {{ $admins->total() }} entries
+                    @if (count($modules) > 0)
+                        Showing {{ $modules->firstItem() }} to {{ $modules->lastItem() }} of
+                        {{ $modules->total() }} entries
                     @endif
                 </div>
 
                 {{-- Pagination --}}
                 <div class="d-flex justify-content-center">
-                    {!! $admins->links() !!}
+                    {!! $modules->links() !!}
                 </div>
             </div>
             {{-- / Table --}}
@@ -175,9 +152,24 @@
                                 return '';
                             }
                         },
+
+
+                        {
+                            targets: 1,
+
+                            responsivePriority: 1,
+                            // checkboxes: !0,
+                            checkboxes: {
+                                //selectRow: !0,
+                                selectAllRender: '<input type="checkbox" class="form-check-input">',
+                            },
+                            render: function() {
+                                return '<input type="checkbox" class="dt-checkboxes form-check-input">';
+                            },
+                        },
                         {
                             responsivePriority: 1,
-                            targets: 2,
+                            targets: 3,
                         },
 
                         {
@@ -196,7 +188,7 @@
                             display: $.fn.dataTable.Responsive.display.modal({
                                 header: function(row) {
                                     var data = row.data();
-                                    return 'Details of ' + data[2];
+                                    return 'Details of ' + data[3];
                                 }
                             }),
                             type: 'column',
@@ -230,30 +222,44 @@
         });
     </script>
 
-
     <script type="text/javascript">
-        function create() {
-            create_form_modal('/admin/settings/admin');
-        }
-
         $(document).ready(function() {
 
-            // View Form
-            $("#base-table").on("click", ".view", function() {
+            // Restore
+            $("#base-table").on("click", ".restore", function() {
                 var id = $(this).attr('id');
-                view_modal('/admin/settings/admin', id)
+                restore_single('/admin/settings/module/restore', id)
             });
 
-            // Edit Form
-            $("#base-table").on("click", ".edit", function() {
+            // Permanent Delete
+            $("#base-table").on("click", ".permanentDelete", function() {
                 var id = $(this).attr('id');
-                edit_form_modal('/admin/settings/admin', id)
+                permanent_delete_single('/admin/settings/module/permanentDelete', id)
             });
 
-            // Delete
-            $("#base-table").on("click", ".delete", function() {
-                var id = $(this).attr('id');
-                soft_delete('/admin/settings/admin', id)
+
+            // Restore selected
+            $(".restore_selected").on("click", function() {
+                var ids = [];
+
+                $(".dt-checkboxes:checked").each(function() {
+                    var id = $(this).parents('tr').find('input[name=id]').val();
+                    ids.push(id);
+                });
+
+                restore_selected('/admin/settings/module/restoreSelected', ids)
+            });
+
+            // Permanent Delete
+            $(".remove_selected").on("click", function() {
+                var ids = [];
+
+                $(".dt-checkboxes:checked").each(function() {
+                    var id = $(this).parents('tr').find('input[name=id]').val();
+                    ids.push(id);
+                });
+                permanent_delete_selected('/admin/settings/module/permanentDeleteSelected',
+                    ids)
             });
 
         });

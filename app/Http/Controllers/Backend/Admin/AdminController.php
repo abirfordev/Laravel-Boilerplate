@@ -260,7 +260,7 @@ class AdminController extends Controller
 
         $name = null;
         $email = null;
-        $admins = Admin::latest()->onlyTrashed();
+        $admins = Admin::latest('deleted_at')->onlyTrashed();
         if ($request->has('name') && !empty($request->input('name'))) {
             $name = $request->name;
             $admins = $admins->where('name', 'like', '%' . $name . '%');
@@ -273,7 +273,6 @@ class AdminController extends Controller
 
         return view('backend.admin.admin.trash', compact('admins', 'name', 'email'));
     }
-
 
     public function restore(Request $request, $id)
     {
