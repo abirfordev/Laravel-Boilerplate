@@ -1,8 +1,8 @@
 @extends('backend.admin.layout.master')
-@section('title', 'Permission')
+@section('title', 'Role')
 @section('nav-icon-title')
-    <i class="fa-solid fa-person-circle-exclamation m-2"></i>
-    <p class="m-0 p-0">Permission</p>
+    <i class="fa-solid fa-user-check m-2"></i>
+    <p class="m-0 p-0">Role</p>
 @endsection
 
 @section('content')
@@ -11,7 +11,7 @@
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb breadcrumb-style2 mb-0">
-                <li class="breadcrumb-item active">Permission</li>
+                <li class="breadcrumb-item active">Role</li>
             </ol>
         </nav>
         <!--/ Breadcrumb -->
@@ -39,20 +39,26 @@
                         </li>
                     </ul>
                 </div>
-                <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
+
+                <a href="{{ route('admin.role.create') }}" class="btn rounded-pill btn-primary mt-1 me-1">
                     <i class='bx bx-plus me-1'></i>
                     <span class="d-none d-sm-block">Add New Record</span>
-                </button>
+                </a>
+
+                <a href="{{ route('admin.settings.role.trash') }}" class="btn rounded-pill btn-outline-danger mt-1 me-1">
+                    <i class='bx bx-trash me-1'></i>
+                    <span class="d-none d-sm-block">Trash</span>
+                </a>
             </div>
             {{-- / Export and Add new Button --}}
 
             <!--Search Form -->
             <div class="card-body">
-                <form id="search_category" action="" method="GET">
+                <form id="search_role" action="" method="GET">
                     <div class="row justify-content-center g-3">
                         <div class="col-12 col-md-4">
 
-                            <input type="text" class="form-control" placeholder="Type permission name" id="name"
+                            <input type="text" class="form-control" placeholder="Type role name" id="name"
                                 name="name" @isset($name) value="{{ $name }}" @endisset>
                         </div>
 
@@ -73,36 +79,31 @@
                         <tr>
                             <th></th>
                             <th>#</th>
-                            <th>Permission Name</th>
-                            <th>Module</th>
-                            <th>Label</th>
-                            <th>Visible to Role</th>
+                            <th>Role Name</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($permissions as $key => $data)
+                        @foreach ($roles as $key => $data)
                             <tr>
                                 <td></td>
-                                <td>{{ $key + 1 + ($permissions->currentPage() - 1) * $permissions->perPage() }}</td>
+                                <td>{{ $key + 1 + ($roles->currentPage() - 1) * $roles->perPage() }}</td>
                                 <td>{{ $data->name }}</td>
-                                <td>{{ $data->module->name }}</td>
-                                <td>{{ $data->label }}</td>
-                                <td class="text-center"><span
-                                        class="badge rounded-pill {{ $data->is_visibile_to_role ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->is_visibile_to_role ? 'Yes' : 'No' }}</span>
-                                </td>
-
                                 <td><span
                                         class="badge rounded-pill {{ $data->status ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->status ? 'Active' : 'Inactive' }}</span>
                                 </td>
                                 <td>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-show text-primary view' title="View"></i>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-edit text-success edit' title="Edit"></i>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-trash text-danger delete' title="Delete"></i>
+                                    @if ($data->name !== 'Master Admin')
+                                        <a href={{ route('admin.role.edit', ['role' => $data->id]) }}>
+
+                                            <i data-toggle="tooltip" class='bx bx-edit text-success edit'
+                                                title="Edit"></i>
+                                        </a>
+                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
+                                            class='bx bx-trash text-warning delete' title="Delete"></i>
+                                    @endif
+
                                 </td>
 
 
@@ -115,15 +116,15 @@
                 </table>
                 {{-- Info --}}
                 <div class="d-flex justify-content-center m-3 text-muted">
-                    @if (count($permissions) > 0)
-                        Showing {{ $permissions->firstItem() }} to {{ $permissions->lastItem() }} of
-                        {{ $permissions->total() }} entries
+                    @if (count($roles) > 0)
+                        Showing {{ $roles->firstItem() }} to {{ $roles->lastItem() }} of
+                        {{ $roles->total() }} entries
                     @endif
                 </div>
 
                 {{-- Pagination --}}
                 <div class="d-flex justify-content-center">
-                    {!! $permissions->links() !!}
+                    {!! $roles->links() !!}
                 </div>
             </div>
             {{-- / Table --}}
@@ -213,29 +214,12 @@
     </script>
 
     <script type="text/javascript">
-        function create() {
-            create_form_modal('/admin/settings/permission');
-        }
-
         $(document).ready(function() {
-
-            // View Form
-            $("#base-table").on("click", ".view", function() {
-                var id = $(this).attr('id');
-                view_modal('/admin/settings/permission', id)
-            });
-
-            // Edit Form
-            $("#base-table").on("click", ".edit", function() {
-                var id = $(this).attr('id');
-                edit_form_modal('/admin/settings/permission', id)
-            });
-
 
             // Delete
             $("#base-table").on("click", ".delete", function() {
                 var id = $(this).attr('id');
-                permanent_delete_single('/admin/settings/permission', id)
+                soft_delete('/admin/settings/role', id)
             });
 
         });

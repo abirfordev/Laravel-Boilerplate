@@ -52,19 +52,23 @@ Route::resource('settings/module', 'ModuleController');
 // --/ Routes for Module
 
 // Routes for Permission
-// Route::group(
-//     [
-//         'controller' => 'PermissionController',
-//         'prefix' => 'settings/permission',
-//         'as' => 'settings.permission.',
-//     ],
-//     function () {
-//         Route::get('/trash', 'trashList')->name('trash');
-//         Route::get('restore/{id}', 'restore')->name('restore');
-//         Route::get('restoreSelected/{ids}', 'restoreSelected')->name('restoreSelected');
-//         Route::delete('permanentDelete/{id}', 'permanentDelete')->name('permanentDelete');
-//         Route::delete('permanentDeleteSelected/{ids}', 'permanentDeleteSelected')->name('permanentDeleteSelected');
-//     }
-// );
 Route::resource('settings/permission', 'PermissionController');
 // --/ Routes for Permission
+
+// Routes for Role
+Route::group(
+    [
+        'controller' => 'RoleController',
+        'prefix' => 'settings/role',
+        'as' => 'settings.role.',
+    ],
+    function () {
+        Route::get('/trash', 'trashList')->name('trash');
+        Route::get('restore/{id}', 'restore')->name('restore');
+        Route::get('restoreSelected/{ids}', 'restoreSelected')->name('restoreSelected');
+        Route::delete('permanentDelete/{id}', 'permanentDelete')->name('permanentDelete');
+        Route::delete('permanentDeleteSelected/{ids}', 'permanentDeleteSelected')->name('permanentDeleteSelected');
+    }
+);
+Route::resource('settings/role', 'RoleController');
+// --/ Routes for Role

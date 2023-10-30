@@ -65,19 +65,11 @@ class PermissionController extends Controller
                     'errors' => $validator->getMessageBag()->toArray()
                 ]);
             } else {
-
-                // $modules = array_filter($request->input('module_id'));
                 $modules = $request->input('module_id');
 
 
-                // if (!is_array($modules) && count($modules) == 0) {
-                //     return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>No modules are selected</div>"]);
-                // }
-
                 DB::beginTransaction();
                 try {
-
-
                     foreach ($modules as $module) {
 
                         $arr = explode(', ', $module);
@@ -88,18 +80,15 @@ class PermissionController extends Controller
                             'module_id' => $arr[0],
                             'is_visibile_to_role' => $request->has('is_visibile_to_role') ? 1 : 0
                         ];
-                        //dd($data);
                         Permission::Create($data);
                     }
-
-                    // DB::table('permissions')->insert($bulk_data);
 
                     DB::commit();
 
                     return response()->json(['type' => 'success', 'message' => "Successfully Created"]);
                 } catch (Exception $e) {
                     DB::rollback();
-                    return response()->json(['type' => 'error', 'message' => $e->getMessage()]);
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                 }
             }
         } else {
@@ -170,7 +159,7 @@ class PermissionController extends Controller
                     return response()->json(['type' => 'success', 'message' => "Successfully Updated"]);
                 } catch (Exception $e) {
                     DB::rollback();
-                    return response()->json(['type' => 'error', 'message' => $e->getMessage()]);
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                 }
             }
         } else {
@@ -192,7 +181,7 @@ class PermissionController extends Controller
                 return response()->json(['type' => 'success', 'message' => 'Successfully Deleted']);
             } catch (Exception $e) {
                 DB::rollback();
-                return response()->json(['type' => 'error', 'message' => $e->getMessage()]);
+                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);

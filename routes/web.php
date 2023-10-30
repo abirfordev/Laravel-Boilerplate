@@ -43,10 +43,12 @@ Route::group(
     }
 );
 
-// Route::get('/admin/login', function () {
-//     return view('auth.admin.login');
-// })->name('admin.login');
 
 // Auth::routes();
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+
+
+Route::fallback(function () {
+    return view('error.404');
+});

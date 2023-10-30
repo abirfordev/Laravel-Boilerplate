@@ -23,6 +23,21 @@
         <span id="error_mobile" class="text-danger error"></span>
     </div>
 
+    <div class="col-12 col-md-12 my-1">
+        <label class="form-label" for="role_id">Roles <span class="text-danger">*</span></label>
+        <div class="select2-info">
+            <select id="role_id" class="select2 form-select" name="role_id[]" multiple>
+                @foreach ($roles as $role)
+                    <option value="{{ $role->id }}" {{ $admin->hasRole($role->id) ? 'selected' : '' }}>
+                        {{ $role->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <span id="error_role_id" class="text-danger error"></span>
+    </div>
+
     <div class="col-12 col-md-6 my-1">
         <label class="form-label" for="gender">Gender <span class="text-danger">*</span></label>
         <div class="form-check">
@@ -57,30 +72,13 @@
         <span id="error_status" class="text-danger error"></span>
     </div>
 
-
-
-    {{-- <div class="col-12 col-md-12 my-1">
-        <label class="form-label" for="role_id">Roles <span class="text-danger">*</span></label>
-        <div class="select2-info">
-            <select id="role_id" class="select2 form-select" name="role_id[]" multiple>
-                @foreach ($roles as $role)
-                    <option value="{{ $role->id }}">{{ $role->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <span id="error_role_id" class="text-danger error"></span>
-    </div> --}}
-
-
     <div class="col-12 col-md-12 my-1">
         <label class="form-label" for="image">Image</label>
 
 
         <div class="button-wrapper text-center">
-            <img src="{{ asset($admin->image) }}" alt="admin image" class="rounded mb-2" height="200" width="200"
-                id="image" />
+            <img src="{{ asset($admin->image) }}" alt="admin image" class="rounded mb-2" height="200"
+                width="200" id="image" />
             <br>
             <label for="upload" class="btn btn-outline-info btn-sm" tabindex="0">
                 <span class="d-none d-sm-block">Change Image</span>
@@ -88,18 +86,12 @@
                 <input id="upload" class="upload-image" type="file" name="image" hidden
                     accept=".jpg, .jpeg, .png, .webp" />
             </label>
-            {{-- <button type="button" class="btn btn-outline-secondary account-image-reset mb-4">
-                <i class="bx bx-reset d-block d-sm-none"></i>
-                <span class="d-none d-sm-block">Reset</span>
-            </button> --}}
 
             <p class="text-muted mb-0">Allowed jpg, jpeg, webp, png format image. Max size of 2MB</p>
         </div>
 
         <span id="error_image" class="text-danger error"></span>
     </div>
-
-
 
     <div class="col-12 my-1 text-end">
         <button class="btn btn-secondary button-reset" type="reset">
@@ -140,6 +132,11 @@
 </script>
 <script>
     $(document).ready(function() {
+
+        $('.select2').select2({
+            dropdownParent: $("#base_modal"),
+            placeholder: 'Choose role',
+        });
 
         $('.button-update').click(function() {
             // route name and record id

@@ -45,6 +45,12 @@
                     </a>
                 </li>
 
+                <li class="menu-item {{ request()->is('admin/settings/role*') ? 'active' : '' }}">
+                    <a href="{{ route('admin.role.index') }}" class="menu-link">
+                        <div data-i18n="Role">Role</div>
+                    </a>
+                </li>
+
                 <li class="menu-item {{ request()->is('admin/settings/admin*') ? 'active' : '' }}">
                     <a href="{{ route('admin.admin.index') }}" class="menu-link">
                         <div data-i18n="Admin">Admin</div>

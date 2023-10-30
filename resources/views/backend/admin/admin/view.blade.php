@@ -14,6 +14,15 @@
                     <th>Mobile No</th>
                     <td> {{ $admin->mobile }} </td>
                 </tr>
+
+                <tr>
+                    <th>Roles</th>
+                    <td>
+                        @foreach ($admin->getRoleNames() as $role)
+                            <span class="badge rounded-pill bg-info ">{{ $role }}</span>
+                        @endforeach
+                    </td>
+                </tr>
                 <tr>
                     <th>Gender</th>
                     <td>{{ $admin->gender }}

@@ -39,37 +39,6 @@
             </div> --}}
             {{-- / Export and Add new Button --}}
 
-            <!--Search Form -->
-            {{-- <div class="card-body">
-                <form class="d-flex justify-content-center" id="search_admin" action="" method="GET">
-                    <div class="row">
-                        <div class="col-12">
-                            <div class="row g-3">
-                                <div class="col-12 col-md-4">
-
-                                    <input type="text" class="form-control" placeholder="Type name" id="name"
-                                        name="name"
-                                        @isset($name) value="{{ $name }}" @endisset>
-                                </div>
-
-                                <div class="col-12 col-md-4">
-
-                                    <input type="text" class="form-control" placeholder="Type email" id="email"
-                                        name="email"
-                                        @isset($email) value="{{ $email }}" @endisset>
-                                </div>
-
-
-                                <div class="col-12 col-md-4">
-                                    <button class="btn btn-primary" type="submit">Filter</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </form>
-            </div> --}}
-            <!--/ Search Form -->
-
             {{-- Table --}}
             <div class="card-datatable table-responsive mt-3">
                 <table class="table border-top" id="base-table">

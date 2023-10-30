@@ -20,34 +20,19 @@
         <div class="card">
             {{-- Export and Add new Button --}}
             <div class="d-flex flex-wrap justify-content-end mt-2">
-                <div class="btn-group" id="dropdown-icon-demo">
-                    <button type="button" class="btn rounded-pill btn-outline-info dropdown-toggle mt-1 me-1"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bx bxs-file-export me-1"></i>
-                        <span class="d-none d-sm-block">Export</span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="#" class="dropdown-item">
-                                Export all data
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="dropdown-item">
-                                Export filtered data
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                {{-- @can('admin_create') --}}
                 <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
                     <i class='bx bx-plus me-1'></i>
                     <span class="d-none d-sm-block">Add New Record</span>
                 </button>
+                {{-- @endcan --}}
 
-                <a href="{{ route('admin.settings.admin.trash') }}" class="btn rounded-pill btn-outline-danger mt-1 me-1">
-                    <i class='bx bx-trash me-1'></i>
-                    <span class="d-none d-sm-block">Trash</span>
-                </a>
+                @can('admin_trash')
+                    <a href="{{ route('admin.settings.admin.trash') }}" class="btn rounded-pill btn-outline-danger mt-1 me-1">
+                        <i class='bx bx-trash me-1'></i>
+                        <span class="d-none d-sm-block">Trash</span>
+                    </a>
+                @endcan
             </div>
             {{-- / Export and Add new Button --}}
 
@@ -115,12 +100,20 @@
                                         class="badge rounded-pill {{ $data->status ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->status ? 'Active' : 'Inactive' }}</span>
                                 </td>
                                 <td>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-show text-primary view' title="View"></i>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-edit text-success edit' title="Edit"></i>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-trash text-warning delete' title="Delete"></i>
+                                    @can('admin_read')
+                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
+                                            class='bx bx-show text-primary view' title="View"></i>
+                                    @endcan
+                                    @if ($data->email !== 'masteradmin@admin.com')
+                                        @can('admin_update')
+                                            <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
+                                                class='bx bx-edit text-success edit' title="Edit"></i>
+                                        @endcan
+                                        @can('admin_delete')
+                                            <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
+                                                class='bx bx-trash text-warning delete' title="Delete"></i>
+                                        @endcan
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

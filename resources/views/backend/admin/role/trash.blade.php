@@ -1,8 +1,8 @@
 @extends('backend.admin.layout.master')
-@section('title', 'Permission')
+@section('title', 'Trash Role')
 @section('nav-icon-title')
-    <i class="fa-solid fa-person-circle-exclamation m-2"></i>
-    <p class="m-0 p-0">Permission</p>
+    <i class="fa-solid fa-user-check m-2"></i>
+    <p class="m-0 p-0">Trash Role</p>
 @endsection
 
 @section('content')
@@ -11,48 +11,43 @@
         <!-- Breadcrumb -->
         <nav aria-label="breadcrumb" class="mb-3">
             <ol class="breadcrumb breadcrumb-style2 mb-0">
-                <li class="breadcrumb-item active">Permission</li>
+
+                <li class="breadcrumb-item">
+                    <a href="{{ route('admin.role.index') }}">Role</a>
+                </li>
+                <li class="breadcrumb-item active">Trash</li>
             </ol>
         </nav>
         <!--/ Breadcrumb -->
 
+
+
         <!-- DataTable with Buttons -->
         <div class="card">
-            {{-- Export and Add new Button --}}
-            <div class="d-flex flex-wrap justify-content-end mt-2">
-                <div class="btn-group" id="dropdown-icon-demo">
-                    <button type="button" class="btn rounded-pill btn-outline-info dropdown-toggle mt-1 me-1"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bx bxs-file-export me-1"></i>
-                        <span class="d-none d-sm-block">Export</span>
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li>
-                            <a href="#" class="dropdown-item">
-                                Export all data
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="dropdown-item">
-                                Export filtered data
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
-                    <i class='bx bx-plus me-1'></i>
-                    <span class="d-none d-sm-block">Add New Record</span>
+            {{-- Restore and Remove Button --}}
+            <div class="d-flex flex-wrap justify-content-end my-3">
+
+                <button class="btn rounded-pill btn-primary restore_selected mt-1 me-1" type="button">
+                    <i class='bx bxs-direction-left me-1'></i>
+                    <span class="d-none d-sm-block">Restore Selected</span>
                 </button>
+
+                <button class="btn rounded-pill btn-outline-danger remove_selected mt-1 me-1" type="button">
+                    <i class='fa-solid fa-ban me-1'></i>
+                    <span class="d-none d-sm-block">Remove Selected</span>
+                </button>
+
+
             </div>
-            {{-- / Export and Add new Button --}}
+            {{-- / Restore and Remove Button --}}
 
             <!--Search Form -->
             <div class="card-body">
-                <form id="search_category" action="" method="GET">
+                <form id="search_role" action="" method="GET">
                     <div class="row justify-content-center g-3">
                         <div class="col-12 col-md-4">
 
-                            <input type="text" class="form-control" placeholder="Type permission name" id="name"
+                            <input type="text" class="form-control" placeholder="Type role name" id="name"
                                 name="name" @isset($name) value="{{ $name }}" @endisset>
                         </div>
 
@@ -66,46 +61,39 @@
             </div>
             <!--/ Search Form -->
 
+
             {{-- Table --}}
             <div class="card-datatable table-responsive">
                 <table class="table border-top" id="base-table">
                     <thead>
                         <tr>
                             <th></th>
+                            <th></th>
                             <th>#</th>
-                            <th>Permission Name</th>
-                            <th>Module</th>
-                            <th>Label</th>
-                            <th>Visible to Role</th>
+                            <th>Role Name</th>
                             <th>Status</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($permissions as $key => $data)
+                        @foreach ($roles as $key => $data)
                             <tr>
                                 <td></td>
-                                <td>{{ $key + 1 + ($permissions->currentPage() - 1) * $permissions->perPage() }}</td>
-                                <td>{{ $data->name }}</td>
-                                <td>{{ $data->module->name }}</td>
-                                <td>{{ $data->label }}</td>
-                                <td class="text-center"><span
-                                        class="badge rounded-pill {{ $data->is_visibile_to_role ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->is_visibile_to_role ? 'Yes' : 'No' }}</span>
+                                <td>{{ $data->id }}</td>
+                                <td>{{ $key + 1 + ($roles->currentPage() - 1) * $roles->perPage() }}
+                                    <input type="hidden" name="id" value="{{ $data->id }}" />
                                 </td>
-
+                                <td>{{ $data->name }}</td>
                                 <td><span
                                         class="badge rounded-pill {{ $data->status ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->status ? 'Active' : 'Inactive' }}</span>
                                 </td>
                                 <td>
                                     <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-show text-primary view' title="View"></i>
+                                        class='bx bxs-direction-left text-primary restore' title="Restore"></i>
                                     <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-edit text-success edit' title="Edit"></i>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-trash text-danger delete' title="Delete"></i>
+                                        class='fa-solid fa-ban text-danger permanentDelete' title="Permanent Delete"></i>
+
                                 </td>
-
-
 
 
                             </tr>
@@ -115,15 +103,15 @@
                 </table>
                 {{-- Info --}}
                 <div class="d-flex justify-content-center m-3 text-muted">
-                    @if (count($permissions) > 0)
-                        Showing {{ $permissions->firstItem() }} to {{ $permissions->lastItem() }} of
-                        {{ $permissions->total() }} entries
+                    @if (count($roles) > 0)
+                        Showing {{ $roles->firstItem() }} to {{ $roles->lastItem() }} of
+                        {{ $roles->total() }} entries
                     @endif
                 </div>
 
                 {{-- Pagination --}}
                 <div class="d-flex justify-content-center">
-                    {!! $permissions->links() !!}
+                    {!! $roles->links() !!}
                 </div>
             </div>
             {{-- / Table --}}
@@ -157,9 +145,24 @@
                                 return '';
                             }
                         },
+
+
+                        {
+                            targets: 1,
+
+                            responsivePriority: 1,
+                            // checkboxes: !0,
+                            checkboxes: {
+                                //selectRow: !0,
+                                selectAllRender: '<input type="checkbox" class="form-check-input">',
+                            },
+                            render: function() {
+                                return '<input type="checkbox" class="dt-checkboxes form-check-input">';
+                            },
+                        },
                         {
                             responsivePriority: 1,
-                            targets: 2,
+                            targets: 3,
                         },
 
                         {
@@ -178,7 +181,7 @@
                             display: $.fn.dataTable.Responsive.display.modal({
                                 header: function(row) {
                                     var data = row.data();
-                                    return 'Details of ' + data[2];
+                                    return 'Details of ' + data[3];
                                 }
                             }),
                             type: 'column',
@@ -213,29 +216,43 @@
     </script>
 
     <script type="text/javascript">
-        function create() {
-            create_form_modal('/admin/settings/permission');
-        }
-
         $(document).ready(function() {
 
-            // View Form
-            $("#base-table").on("click", ".view", function() {
+            // Restore
+            $("#base-table").on("click", ".restore", function() {
                 var id = $(this).attr('id');
-                view_modal('/admin/settings/permission', id)
+                restore_single('/admin/settings/role/restore', id)
             });
 
-            // Edit Form
-            $("#base-table").on("click", ".edit", function() {
+            // Permanent Delete
+            $("#base-table").on("click", ".permanentDelete", function() {
                 var id = $(this).attr('id');
-                edit_form_modal('/admin/settings/permission', id)
+                permanent_delete_single('/admin/settings/role/permanentDelete', id)
             });
 
 
-            // Delete
-            $("#base-table").on("click", ".delete", function() {
-                var id = $(this).attr('id');
-                permanent_delete_single('/admin/settings/permission', id)
+            // Restore selected
+            $(".restore_selected").on("click", function() {
+                var ids = [];
+
+                $(".dt-checkboxes:checked").each(function() {
+                    var id = $(this).parents('tr').find('input[name=id]').val();
+                    ids.push(id);
+                });
+
+                restore_selected('/admin/settings/role/restoreSelected', ids)
+            });
+
+            // Permanent Delete
+            $(".remove_selected").on("click", function() {
+                var ids = [];
+
+                $(".dt-checkboxes:checked").each(function() {
+                    var id = $(this).parents('tr').find('input[name=id]').val();
+                    ids.push(id);
+                });
+                permanent_delete_selected('/admin/settings/role/permanentDeleteSelected',
+                    ids)
             });
 
         });

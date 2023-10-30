@@ -29,8 +29,6 @@ class SettingController extends Controller
         if ($request->ajax()) {
             $view = View::make('backend.admin.setting.create')->render();
             return response()->json(['html' => $view]);
-            // $roles = Role::all();
-            // return view('backend.admin.admin.create', compact('roles'));
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
         }
@@ -71,7 +69,7 @@ class SettingController extends Controller
                     return response()->json(['type' => 'success', 'message' => "Successfully Created"]);
                 } catch (Exception $e) {
                     DB::rollback();
-                    return response()->json(['type' => 'error', 'message' => $e->getMessage()]);
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                 }
             }
         } else {
@@ -100,21 +98,12 @@ class SettingController extends Controller
      */
     public function update(Request $request)
     {
-
-        // dd($request->input('settings'));
-        // $requests = $request->input();
-        // array_shift($requests);
-        // array_pop($requests);
-
-        // dd($requests);
-
         if ($request->ajax()) {
 
             DB::beginTransaction();
             try {
 
                 foreach ($request->input('settings') as $key => $value) {
-                    //dd($key, $value);
                     Setting::firstWhere('name', $key)->update([
                         'value' => $value
                     ]);
@@ -125,7 +114,7 @@ class SettingController extends Controller
                 return response()->json(['type' => 'success', 'message' => "Successfully Created"]);
             } catch (Exception $e) {
                 DB::rollback();
-                return response()->json(['type' => 'error', 'message' => $e->getMessage()]);
+                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);

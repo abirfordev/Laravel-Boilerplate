@@ -4,13 +4,15 @@ namespace App\Http\Controllers\backend\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Module;
+use App\Models\Role as AdminRole;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\View;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
 
-class ModuleController extends Controller
+class RoleController extends Controller
 {
     /**
      * Display a listing of the resource.
@@ -18,28 +20,24 @@ class ModuleController extends Controller
     public function index(Request $request)
     {
         $name = null;
-        $modules = Module::latest();
+        $roles = AdminRole::latest();
         if ($request->has('name') && !empty($request->input('name'))) {
             $name = $request->name;
-            $modules = $modules->where('name', 'like', '%' . $name . '%');
+            $roles = $roles->where('name', 'like', '%' . $name . '%');
         }
-        $modules = $modules->paginate(15);
 
-        return view('backend.admin.module.index', compact('modules', 'name'));
+        $roles = $roles->paginate(15);
+
+
+        return view('backend.admin.role.index', compact('roles', 'name'));
     }
-
     /**
      * Show the form for creating a new resource.
      */
-    public function create(Request $request)
+    public function create()
     {
-        if ($request->ajax()) {
-            $modules = Module::whereStatus(1)->get();
-            $view = View::make('backend.admin.module.create', compact('modules'))->render();
-            return response()->json(['html' => $view]);
-        } else {
-            return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
-        }
+        $modules = Module::whereIsLabel(0)->whereIsVisibileToRole(1)->whereStatus(1)->get();
+        return view('backend.admin.role.create', compact('modules'));
     }
 
     /**
@@ -48,12 +46,8 @@ class ModuleController extends Controller
     public function store(Request $request)
     {
         if ($request->ajax()) {
-
             $rules = [
-                'name' => 'required|unique:modules,name',
-                'permission_slug' =>
-                'required|unique:modules,permission_slug',
-                'parent_module_id' => 'required_if:is_children,on',
+                'name' => 'required|unique:roles,name',
             ];
 
             $validator = Validator::make($request->all(), $rules);
@@ -64,23 +58,14 @@ class ModuleController extends Controller
                 ]);
             } else {
 
+
                 DB::beginTransaction();
                 try {
-
-                    $module = new Module();
-                    $module->name = $request->input('name');
-                    $module->url = $request->input('url');
-                    $module->permission_slug = $request->input('permission_slug');
-                    $module->is_children = $request->has('is_children') ? 1 : 0;;
-                    $module->is_label = $request->has('is_label') ? 1 : 0;
-                    $module->is_visibile_to_role = $request->has('is_visibile_to_role') ? 1 : 0;
-                    $module->parent_module_id =
-                        $request->has('is_children') ? $request->input('parent_module_id') : null;
-
-                    $module->save();
+                    $role = Role::create(['name' => $request->input('name')]);
+                    $permissions = array_map('intval', explode(",", $request->input('permissions')));
+                    $role->syncPermissions($permissions);
 
                     DB::commit();
-
                     return response()->json(['type' => 'success', 'message' => "Successfully Created"]);
                 } catch (Exception $e) {
                     DB::rollback();
@@ -95,42 +80,29 @@ class ModuleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Request $request, Module $module)
+    public function show(string $id)
     {
-        if ($request->ajax()) {
-            $view = View::make('backend.admin.module.view', compact('module'))->render();
-            return response()->json(['html' => $view]);
-        } else {
-            return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
-        }
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Request $request, Module $module)
+    public function edit(Role $role)
     {
-        if ($request->ajax()) {
-            $modules = Module::all();
-            $view = View::make('backend.admin.module.edit', compact('module', 'modules'))->render();
-            return response()->json(['html' => $view]);
-        } else {
-            return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
-        }
+        $modules = Module::whereIsLabel(0)->whereIsVisibileToRole(1)->get();
+        return view('backend.admin.role.edit', compact('role', 'modules'));
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Module $module)
+    public function update(Request $request, Role $role)
     {
         if ($request->ajax()) {
-
+            // Setup the validator
             $rules = [
-                'name' => 'required|unique:modules,name,' . $module->id,
-                'permission_slug' =>
-                'required|unique:modules,permission_slug,' . $module->id,
-                'parent_module_id' => 'required_if:is_children,on',
+                'name' => 'required|unique:roles,name,' . $role->id,
             ];
 
             $validator = Validator::make($request->all(), $rules);
@@ -143,18 +115,23 @@ class ModuleController extends Controller
 
                 DB::beginTransaction();
                 try {
+                    $role->name = $request->input('name');
+                    $role->status = $request->input('status');
+                    $role->save();
 
-                    $module->name = $request->input('name');
-                    $module->url = $request->input('url');
-                    $module->permission_slug = $request->input('permission_slug');
-                    $module->is_children = $request->has('is_children') ? 1 : 0;;
-                    $module->is_label = $request->has('is_label') ? 1 : 0;
-                    $module->is_visibile_to_role = $request->has('is_visibile_to_role') ? 1 : 0;
-                    $module->parent_module_id =
-                        $request->has('is_children') ? $request->input('parent_module_id') : null;
+                    $permissions = $request->input('permissions');
 
-                    $module->status = $request->input('status');
-                    $module->save();
+                    if (isset($permissions)) {
+                        $permissions = array_map('intval', explode(",", $permissions));
+                        $role->syncPermissions($permissions);  //If one or more role is selected associate user to roles
+                    } else {
+                        //If no role is selected remove exisiting permissions associated to a role
+                        $all_permissions = $role->getAllPermissions();
+
+                        foreach ($all_permissions as $permission) {
+                            $role->revokePermissionTo($permission); //Remove all permissions associated with role
+                        }
+                    }
 
                     DB::commit();
 
@@ -172,13 +149,13 @@ class ModuleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request, Module $module)
+    public function destroy(Request $request, AdminRole $role)
     {
         if ($request->ajax()) {
 
             DB::beginTransaction();
             try {
-                $module->delete();
+                $role->delete();
                 DB::commit();
                 return response()->json(['type' => 'success', 'message' => 'Successfully Deleted']);
             } catch (Exception $e) {
@@ -192,28 +169,27 @@ class ModuleController extends Controller
 
     public function trashList(Request $request)
     {
-
         $name = null;
-        $modules = Module::latest('deleted_at')->onlyTrashed();
+        $roles = AdminRole::latest('deleted_at')->onlyTrashed();
         if ($request->has('name') && !empty($request->input('name'))) {
             $name = $request->name;
-            $modules = $modules->where('name', 'like', '%' . $name . '%');
+            $roles = $roles->where('name', 'like', '%' . $name . '%');
         }
-        $modules = $modules->paginate(15);
+        $roles = $roles->paginate(15);
 
-        return view('backend.admin.module.trash', compact('modules', 'name'));
+        return view('backend.admin.role.trash', compact('roles', 'name'));
     }
 
     public function restore(Request $request, $id)
     {
         if ($request->ajax()) {
-            $module = Module::withTrashed()->findOrFail($id);
+            $role = AdminRole::withTrashed()->findOrFail($id);
 
             DB::beginTransaction();
             try {
 
-                if (!empty($module)) {
-                    $module->restore();
+                if (!empty($role)) {
+                    $role->restore();
                 }
 
                 DB::commit();
@@ -237,7 +213,7 @@ class ModuleController extends Controller
 
                 $ids = explode(",", $ids);
 
-                Module::withTrashed()->whereIn('id', $ids)->restore();
+                AdminRole::withTrashed()->whereIn('id', $ids)->restore();
 
                 DB::commit();
 
@@ -254,13 +230,13 @@ class ModuleController extends Controller
     public function permanentDelete(Request $request, $id)
     {
         if ($request->ajax()) {
-            $module = Module::withTrashed()->findOrFail($id);
+            $role = AdminRole::withTrashed()->findOrFail($id);
 
             DB::beginTransaction();
             try {
 
-                if (!empty($module)) {
-                    $module->forceDelete();
+                if (!empty($role)) {
+                    $role->forceDelete();
                 }
                 DB::commit();
                 return response()->json(['type' => 'success', 'message' => "Successfully Removed"]);
@@ -282,7 +258,7 @@ class ModuleController extends Controller
 
                 $ids = explode(",", $ids);
 
-                Module::withTrashed()->whereIn('id', $ids)->forceDelete();
+                AdminRole::withTrashed()->whereIn('id', $ids)->forceDelete();
 
                 DB::commit();
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\backend\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Admin;
+use App\Models\Role;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -18,20 +19,25 @@ class AdminController extends Controller
      */
     public function index(Request $request)
     {
-        $name = null;
-        $email = null;
-        $admins = Admin::latest();
-        if ($request->has('name') && !empty($request->input('name'))) {
-            $name = $request->name;
-            $admins = $admins->where('name', 'like', '%' . $name . '%');
-        }
-        if ($request->has('email') && !empty($request->input('email'))) {
-            $email = $request->email;
-            $admins = $admins->where('email', 'like', '%' . $email . '%');
-        }
-        $admins = $admins->paginate(15);
+        if (auth()->user()->hasAnyPermission('admin_create', 'admin_read', 'admin_update', 'admin_delete')) {
+            $name = null;
+            $email = null;
+            $admins = Admin::latest();
+            if ($request->has('name') && !empty($request->input('name'))) {
+                $name = $request->name;
+                $admins = $admins->where('name', 'like', '%' . $name . '%');
+            }
+            if ($request->has('email') && !empty($request->input('email'))) {
+                $email = $request->email;
+                $admins = $admins->where('email', 'like', '%' . $email . '%');
+            }
+            $admins = $admins->paginate(15);
 
-        return view('backend.admin.admin.index', compact('admins', 'name', 'email'));
+            return view('backend.admin.admin.index', compact('admins', 'name', 'email'));
+        } else {
+            $link = "admin.dashboard";
+            return view('error.403', compact('link'));
+        }
     }
 
     /**
@@ -40,10 +46,13 @@ class AdminController extends Controller
     public function create(Request $request)
     {
         if ($request->ajax()) {
-            $view = View::make('backend.admin.admin.create')->render();
-            return response()->json(['html' => $view]);
-            // $roles = Role::all();
-            // return view('backend.admin.admin.create', compact('roles'));
+            if (auth()->user()->can('admin_create')) {
+                $roles = Role::whereStatus(1)->get();
+                $view = View::make('backend.admin.admin.create', compact('roles'))->render();
+                return response()->json(['html' => $view]);
+            } else {
+                abort(403, 'You are not authorized to access this page');
+            }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
         }
@@ -62,7 +71,7 @@ class AdminController extends Controller
                 'email' => 'required|unique:admins,email',
                 'gender' => 'required',
                 'mobile' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                // 'role_id' => 'required',
+                'role_id' => 'required',
                 // 'image' => 'mimes:jpg,jpeg,png,webp|max:2048',
 
             ];
@@ -112,17 +121,18 @@ class AdminController extends Controller
                     $admin->save();
 
                     // generate role
-                    // $roles = $request->input('role_id');
-                    // if (isset($roles)) {
-                    //     $user->syncRoles($roles);
-                    // }
+                    $roles = $request->input('role_id');
+                    if (isset($roles)) {
+                        $all_roles = array_map('intval', $request->input('role_id'));
+                        $admin->syncRoles($all_roles);
+                    }
 
                     DB::commit();
 
                     return response()->json(['type' => 'success', 'message' => "Successfully Created"]);
                 } catch (Exception $e) {
                     DB::rollback();
-                    return response()->json(['type' => 'error', 'message' => $e->getMessage()]);
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                 }
             }
         } else {
@@ -149,7 +159,8 @@ class AdminController extends Controller
     public function edit(Request $request, Admin $admin)
     {
         if ($request->ajax()) {
-            $view = View::make('backend.admin.admin.edit', compact('admin'))->render();
+            $roles = Role::all();
+            $view = View::make('backend.admin.admin.edit', compact('admin', 'roles'))->render();
             return response()->json(['html' => $view]);
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -161,7 +172,6 @@ class AdminController extends Controller
      */
     public function update(Request $request, Admin $admin)
     {
-        //dd($request->hasFile('image'));
 
         if ($request->ajax()) {
 
@@ -172,7 +182,7 @@ class AdminController extends Controller
                 'email' => 'required|unique:admins,email,' . $admin->id,
                 'gender' => 'required',
                 'mobile' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                // 'role_id' => 'required',
+                'role_id' => 'required',
                 'image' => 'mimes:jpg,jpeg,png,webp|max:2048',
             ];
 
@@ -221,12 +231,25 @@ class AdminController extends Controller
                     $admin->status = $request->input('status');
                     $admin->save();
 
+                    $roles = $request->input('role_id');
+                    if (isset($roles)) {
+                        $all_roles = array_map('intval', $request->input('role_id'));
+                        $admin->syncRoles($all_roles); //If one or more role is selected associate admin to roles
+                    } else {
+                        //If no role is selected remove exisiting role associated to a admin
+                        $all_roles = $admin->getRoleNames();
+
+                        foreach ($all_roles as $role) {
+                            $admin->removeRole($role); //Remove all role associated with admin
+                        }
+                    }
+
                     DB::commit();
 
                     return response()->json(['type' => 'success', 'message' => "Successfully Updated"]);
                 } catch (Exception $e) {
                     DB::rollback();
-                    return response()->json(['type' => 'error', 'message' => $e->getMessage()]);
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                 }
             }
         } else {
@@ -248,7 +271,7 @@ class AdminController extends Controller
                 return response()->json(['type' => 'success', 'message' => 'Successfully Deleted']);
             } catch (Exception $e) {
                 DB::rollback();
-                return response()->json(['type' => 'error', 'message' => $e->getMessage()]);
+                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -291,7 +314,7 @@ class AdminController extends Controller
                 return response()->json(['type' => 'success', 'message' => "Successfully Restored"]);
             } catch (Exception $e) {
                 DB::rollback();
-                return response()->json(['type' => 'error', 'message' => $e->getMessage()]);
+                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -314,7 +337,7 @@ class AdminController extends Controller
                 return response()->json(['type' => 'success', 'message' => "Successfully Restored"]);
             } catch (Exception $e) {
                 DB::rollback();
-                return response()->json(['type' => 'error', 'message' => $e->getMessage()]);
+                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -336,7 +359,7 @@ class AdminController extends Controller
                 return response()->json(['type' => 'success', 'message' => "Successfully Removed"]);
             } catch (Exception $e) {
                 DB::rollback();
-                return response()->json(['type' => 'error', 'message' => $e->getMessage()]);
+                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -359,7 +382,7 @@ class AdminController extends Controller
                 return response()->json(['type' => 'success', 'message' => "Successfully Removed"]);
             } catch (Exception $e) {
                 DB::rollback();
-                return response()->json(['type' => 'error', 'message' => $e->getMessage()]);
+                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);

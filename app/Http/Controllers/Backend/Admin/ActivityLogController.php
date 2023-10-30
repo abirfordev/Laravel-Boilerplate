@@ -11,13 +11,7 @@ class ActivityLogController extends Controller
 {
     public function index(Request $request)
     {
-        $name = null;
-        $email = null;
-        //$admins = DB::table('activity_log')->select('causer')->latest()->paginate(10);
         $logs = Activity::latest()->paginate(10);
-        //$admins = Activity::all();
-
-
         return view('backend.admin.activity-log.index', compact('logs'));
     }
 }

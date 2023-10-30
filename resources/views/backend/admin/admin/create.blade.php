@@ -19,6 +19,18 @@
         <span id="error_mobile" class="text-danger error"></span>
     </div>
 
+    <div class="col-12 col-md-12 my-1">
+        <label class="form-label" for="role_id">Roles <span class="text-danger">*</span></label>
+        <select id="role_id" class="select2 form-select" name="role_id[]" multiple>
+            @foreach ($roles as $role)
+                <option value="{{ $role->id }}">{{ $role->name }}
+                </option>
+            @endforeach
+        </select>
+
+        <span id="error_role_id" class="text-danger error"></span>
+    </div>
+
     <div class="col-12 col-md-6 my-1">
         <label class="form-label" for="gender">Gender <span class="text-danger">*</span></label>
         <div class="form-check my-1">
@@ -34,22 +46,6 @@
         </div>
         <span id="error_mobile" class="text-danger error"></span>
     </div>
-
-
-
-    {{-- <div class="col-12 col-md-12 my-1">
-        <label class="form-label" for="role_id">Roles <span class="text-danger">*</span></label>
-        <div class="select2-info">
-            <select id="role_id" class="select2 form-select" name="role_id[]" multiple>
-                @foreach ($roles as $role)
-                    <option value="{{ $role->id }}">{{ $role->name }}
-                    </option>
-                @endforeach
-            </select>
-        </div>
-
-        <span id="error_role_id" class="text-danger error"></span>
-    </div> --}}
 
 
     {{-- <div class="col-12 col-md-12 my-1">
@@ -88,6 +84,11 @@
 
 <script>
     $(document).ready(function() {
+
+        $('.select2').select2({
+            dropdownParent: $("#base_modal"),
+            placeholder: 'Choose role',
+        });
 
 
         $('.button-submit').click(function() {
