@@ -4,7 +4,6 @@ namespace App\Http\Controllers\backend\admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\Models\Activity;
 
 class ActivityLogController extends Controller

@@ -65,6 +65,15 @@ function store_data(route) {
                         success: function (data) {
                             response = data;
                         },
+                        error: function (data) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error!",
+                                text: data.responseJSON.message,
+                                showConfirmButton: false,
+                                timer: 5000,
+                            });
+                        },
                     }),
                 backdrop: !0,
                 allowOutsideClick: () => !Swal.isLoading(),
@@ -176,6 +185,15 @@ function update_data(route, id) {
                         success: function (data) {
                             response = data;
                         },
+                        error: function (data) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error!",
+                                text: data.responseJSON.message,
+                                showConfirmButton: false,
+                                timer: 5000,
+                            });
+                        },
                     }),
                 backdrop: !0,
                 allowOutsideClick: () => !Swal.isLoading(),
@@ -240,11 +258,21 @@ function soft_delete(route, id) {
                 success: function (data) {
                     response = data;
                 },
+                error: function (data) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error!",
+                        text: data.responseJSON.message,
+                        showConfirmButton: false,
+                        timer: 5000,
+                    });
+                },
             }),
 
         backdrop: !0,
         allowOutsideClick: () => !Swal.isLoading(),
     }).then(() => {
+        console.log(response);
         if (response.type === "success") {
             //window.location.href = "/admin/demo";
 
@@ -295,6 +323,15 @@ function restore_single(route, id) {
                 dataType: "json",
                 success: function (data) {
                     response = data;
+                },
+                error: function (data) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error!",
+                        text: data.responseJSON.message,
+                        showConfirmButton: false,
+                        timer: 5000,
+                    });
                 },
             }),
 
@@ -352,6 +389,15 @@ function restore_selected(route, ids) {
                     dataType: "json",
                     success: function (data) {
                         response = data;
+                    },
+                    error: function (data) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error!",
+                            text: data.responseJSON.message,
+                            showConfirmButton: false,
+                            timer: 5000,
+                        });
                     },
                 }),
 
@@ -419,6 +465,15 @@ function permanent_delete_single(route, id) {
                 success: function (data) {
                     response = data;
                 },
+                error: function (data) {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error!",
+                        text: data.responseJSON.message,
+                        showConfirmButton: false,
+                        timer: 5000,
+                    });
+                },
             }),
 
         backdrop: !0,
@@ -476,6 +531,15 @@ function permanent_delete_selected(route, ids) {
                     dataType: "json",
                     success: function (data) {
                         response = data;
+                    },
+                    error: function (data) {
+                        Swal.fire({
+                            icon: "error",
+                            title: "Error!",
+                            text: data.responseJSON.message,
+                            showConfirmButton: false,
+                            timer: 5000,
+                        });
                     },
                 }),
 

@@ -19,7 +19,7 @@ class AdminController extends Controller
      */
     public function index(Request $request)
     {
-        if (auth()->user()->hasAnyPermission('admin_create', 'admin_read', 'admin_update', 'admin_delete')) {
+        if (auth()->user()->can('admin_read')) {
             $name = null;
             $email = null;
             $admins = Admin::latest();
@@ -51,7 +51,7 @@ class AdminController extends Controller
                 $view = View::make('backend.admin.admin.create', compact('roles'))->render();
                 return response()->json(['html' => $view]);
             } else {
-                abort(403, 'You are not authorized to access this page');
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -65,75 +65,78 @@ class AdminController extends Controller
     {
 
         if ($request->ajax()) {
+            if (auth()->user()->can('admin_create')) {
+                $rules = [
+                    'name' => 'required',
+                    'email' => 'required|unique:admins,email',
+                    'gender' => 'required',
+                    'mobile' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
+                    'role_id' => 'required',
+                    // 'image' => 'mimes:jpg,jpeg,png,webp|max:2048',
 
-            $rules = [
-                'name' => 'required',
-                'email' => 'required|unique:admins,email',
-                'gender' => 'required',
-                'mobile' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'role_id' => 'required',
-                // 'image' => 'mimes:jpg,jpeg,png,webp|max:2048',
+                ];
 
-            ];
+                $validator = Validator::make($request->all(), $rules);
+                if ($validator->fails()) {
+                    return response()->json([
+                        'type' => 'error',
+                        'errors' => $validator->getMessageBag()->toArray()
+                    ]);
+                } else {
 
-            $validator = Validator::make($request->all(), $rules);
-            if ($validator->fails()) {
-                return response()->json([
-                    'type' => 'error',
-                    'errors' => $validator->getMessageBag()->toArray()
-                ]);
-            } else {
+                    DB::beginTransaction();
+                    try {
 
-                DB::beginTransaction();
-                try {
+                        $file_path = $request->input('gender') == "Male" ? 'assets\img\avatars\male_avatar.png' : 'assets\img\avatars\female_avatar.png';
 
-                    $file_path = $request->input('gender') == "Male" ? 'assets\img\avatars\male_avatar.png' : 'assets\img\avatars\female_avatar.png';
+                        // if ($request->hasFile('image')) {
+                        //     $extension = $request->file('image')->getClientOriginalExtension();;
+                        //     if ($extension == "jpg" || $extension == "jpeg" || $extension == "png" || $extension == "pdf") {
+                        //         if ($request->file('image')->isValid()) {
+                        //             $destinationPath = public_path('assets/img/admin_images'); // upload path
+                        //             $fileName = time() . '.' . $extension; // renameing image
+                        //             $file_path = 'assets/img/admin_images/' . $fileName;
+                        //             $request->file('image')->move($destinationPath, $fileName);
+                        //         } else {
+                        //             return response()->json([
+                        //                 'type' => 'error',
+                        //                 'message' => "<div class='alert alert-warning'>File is not valid</div>"
+                        //             ]);
+                        //         }
+                        //     } else {
+                        //         return response()->json([
+                        //             'type' => 'error',
+                        //             'message' => "<div class='alert alert-warning'>Error! File type is not valid</div>"
+                        //         ]);
+                        //     }
+                        // }
 
-                    // if ($request->hasFile('image')) {
-                    //     $extension = $request->file('image')->getClientOriginalExtension();;
-                    //     if ($extension == "jpg" || $extension == "jpeg" || $extension == "png" || $extension == "pdf") {
-                    //         if ($request->file('image')->isValid()) {
-                    //             $destinationPath = public_path('assets/img/admin_images'); // upload path
-                    //             $fileName = time() . '.' . $extension; // renameing image
-                    //             $file_path = 'assets/img/admin_images/' . $fileName;
-                    //             $request->file('image')->move($destinationPath, $fileName);
-                    //         } else {
-                    //             return response()->json([
-                    //                 'type' => 'error',
-                    //                 'message' => "<div class='alert alert-warning'>File is not valid</div>"
-                    //             ]);
-                    //         }
-                    //     } else {
-                    //         return response()->json([
-                    //             'type' => 'error',
-                    //             'message' => "<div class='alert alert-warning'>Error! File type is not valid</div>"
-                    //         ]);
-                    //     }
-                    // }
+                        $admin = new Admin();
+                        $admin->name = $request->input('name');
+                        $admin->email = $request->input('email');
+                        $admin->mobile = $request->input('mobile');
+                        $admin->gender = $request->input('gender');
+                        $admin->image = $file_path;
+                        $admin->password = Hash::make('123456');
+                        $admin->save();
 
-                    $admin = new Admin();
-                    $admin->name = $request->input('name');
-                    $admin->email = $request->input('email');
-                    $admin->mobile = $request->input('mobile');
-                    $admin->gender = $request->input('gender');
-                    $admin->image = $file_path;
-                    $admin->password = Hash::make('123456');
-                    $admin->save();
+                        // generate role
+                        $roles = $request->input('role_id');
+                        if (isset($roles)) {
+                            $all_roles = array_map('intval', $request->input('role_id'));
+                            $admin->syncRoles($all_roles);
+                        }
 
-                    // generate role
-                    $roles = $request->input('role_id');
-                    if (isset($roles)) {
-                        $all_roles = array_map('intval', $request->input('role_id'));
-                        $admin->syncRoles($all_roles);
+                        DB::commit();
+
+                        return response()->json(['type' => 'success', 'message' => "Successfully Created"]);
+                    } catch (Exception $e) {
+                        DB::rollback();
+                        return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                     }
-
-                    DB::commit();
-
-                    return response()->json(['type' => 'success', 'message' => "Successfully Created"]);
-                } catch (Exception $e) {
-                    DB::rollback();
-                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                 }
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -146,8 +149,12 @@ class AdminController extends Controller
     public function show(Request $request, Admin $admin)
     {
         if ($request->ajax()) {
-            $view = View::make('backend.admin.admin.view', compact('admin'))->render();
-            return response()->json(['html' => $view]);
+            if (auth()->user()->can('admin_read')) {
+                $view = View::make('backend.admin.admin.view', compact('admin'))->render();
+                return response()->json(['html' => $view]);
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
+            }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
         }
@@ -159,9 +166,13 @@ class AdminController extends Controller
     public function edit(Request $request, Admin $admin)
     {
         if ($request->ajax()) {
-            $roles = Role::all();
-            $view = View::make('backend.admin.admin.edit', compact('admin', 'roles'))->render();
-            return response()->json(['html' => $view]);
+            if (auth()->user()->can('admin_update')) {
+                $roles = Role::all();
+                $view = View::make('backend.admin.admin.edit', compact('admin', 'roles'))->render();
+                return response()->json(['html' => $view]);
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
+            }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
         }
@@ -174,83 +185,84 @@ class AdminController extends Controller
     {
 
         if ($request->ajax()) {
+            if (auth()->user()->can('admin_update')) {
+                $rules = [
+                    'name' => 'required',
+                    'email' => 'required|unique:admins,email,' . $admin->id,
+                    'gender' => 'required',
+                    'mobile' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
+                    'role_id' => 'required',
+                    'image' => 'mimes:jpg,jpeg,png,webp|max:2048',
+                ];
 
+                $validator = Validator::make($request->all(), $rules);
+                if ($validator->fails()) {
+                    return response()->json([
+                        'type' => 'error',
+                        'errors' => $validator->getMessageBag()->toArray()
+                    ]);
+                } else {
 
-            $rules = [
+                    DB::beginTransaction();
+                    try {
 
-                'name' => 'required',
-                'email' => 'required|unique:admins,email,' . $admin->id,
-                'gender' => 'required',
-                'mobile' => 'required|regex:/^([0-9\s\-\+\(\)]*)$/',
-                'role_id' => 'required',
-                'image' => 'mimes:jpg,jpeg,png,webp|max:2048',
-            ];
+                        $file_path = $admin->image;
 
-            $validator = Validator::make($request->all(), $rules);
-            if ($validator->fails()) {
-                return response()->json([
-                    'type' => 'error',
-                    'errors' => $validator->getMessageBag()->toArray()
-                ]);
-            } else {
-
-                DB::beginTransaction();
-                try {
-
-                    $file_path = $admin->image;
-
-                    if ($request->hasFile('image')) {
-                        $extension = $request->file('image')->getClientOriginalExtension();;
-                        if ($extension == "jpg" || $extension == "jpeg" || $extension == "png" || $extension == "webp") {
-                            if ($request->file('image')->isValid()) {
-                                $destinationPath = public_path('assets/img/admin_images'); // upload path
-                                $fileName = time() . '.' . $extension; // renameing image
-                                $file_path = 'assets/img/admin_images/' . $fileName;
-                                $request->file('image')->move($destinationPath, $fileName);
+                        if ($request->hasFile('image')) {
+                            $extension = $request->file('image')->getClientOriginalExtension();;
+                            if ($extension == "jpg" || $extension == "jpeg" || $extension == "png" || $extension == "webp") {
+                                if ($request->file('image')->isValid()) {
+                                    $destinationPath = public_path('assets/img/admin_images'); // upload path
+                                    $fileName = time() . '.' . $extension; // renameing image
+                                    $file_path = 'assets/img/admin_images/' . $fileName;
+                                    $request->file('image')->move($destinationPath, $fileName);
+                                } else {
+                                    return response()->json([
+                                        'type' => 'error',
+                                        'message' => "<div class='alert alert-warning'>File is not valid</div>"
+                                    ]);
+                                }
                             } else {
                                 return response()->json([
                                     'type' => 'error',
-                                    'message' => "<div class='alert alert-warning'>File is not valid</div>"
+                                    'message' => "<div class='alert alert-warning'>Error! File type is not valid</div>"
                                 ]);
                             }
+                        }
+
+
+
+                        $admin->name = $request->input('name');
+                        $admin->email = $request->input('email');
+                        $admin->mobile = $request->input('mobile');
+                        $admin->gender = $request->input('gender');
+                        $admin->image = $file_path;
+                        $admin->status = $request->input('status');
+                        $admin->save();
+
+                        $roles = $request->input('role_id');
+                        if (isset($roles)) {
+                            $all_roles = array_map('intval', $request->input('role_id'));
+                            $admin->syncRoles($all_roles); //If one or more role is selected associate admin to roles
                         } else {
-                            return response()->json([
-                                'type' => 'error',
-                                'message' => "<div class='alert alert-warning'>Error! File type is not valid</div>"
-                            ]);
+                            //If no role is selected remove exisiting role associated to a admin
+                            $all_roles = $admin->getRoleNames();
+
+                            foreach ($all_roles as $role) {
+                                $admin->removeRole($role); //Remove all role associated with admin
+                            }
                         }
+
+                        DB::commit();
+
+                        return response()->json(['type' => 'success', 'message' => "Successfully Updated"]);
+                    } catch (Exception $e) {
+                        DB::rollback();
+                        return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                     }
-
-
-
-                    $admin->name = $request->input('name');
-                    $admin->email = $request->input('email');
-                    $admin->mobile = $request->input('mobile');
-                    $admin->gender = $request->input('gender');
-                    $admin->image = $file_path;
-                    $admin->status = $request->input('status');
-                    $admin->save();
-
-                    $roles = $request->input('role_id');
-                    if (isset($roles)) {
-                        $all_roles = array_map('intval', $request->input('role_id'));
-                        $admin->syncRoles($all_roles); //If one or more role is selected associate admin to roles
-                    } else {
-                        //If no role is selected remove exisiting role associated to a admin
-                        $all_roles = $admin->getRoleNames();
-
-                        foreach ($all_roles as $role) {
-                            $admin->removeRole($role); //Remove all role associated with admin
-                        }
-                    }
-
-                    DB::commit();
-
-                    return response()->json(['type' => 'success', 'message' => "Successfully Updated"]);
-                } catch (Exception $e) {
-                    DB::rollback();
-                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                 }
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -263,15 +275,18 @@ class AdminController extends Controller
     public function destroy(Request $request, Admin $admin)
     {
         if ($request->ajax()) {
-
-            DB::beginTransaction();
-            try {
-                $admin->delete();
-                DB::commit();
-                return response()->json(['type' => 'success', 'message' => 'Successfully Deleted']);
-            } catch (Exception $e) {
-                DB::rollback();
-                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+            if (auth()->user()->can('admin_delete')) {
+                DB::beginTransaction();
+                try {
+                    $admin->delete();
+                    DB::commit();
+                    return response()->json(['type' => 'success', 'message' => 'Successfully Deleted']);
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                }
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -280,41 +295,49 @@ class AdminController extends Controller
 
     public function trashList(Request $request)
     {
+        if (auth()->user()->can('admin_trash')) {
+            $name = null;
+            $email = null;
+            $admins = Admin::latest('deleted_at')->onlyTrashed();
+            if ($request->has('name') && !empty($request->input('name'))) {
+                $name = $request->name;
+                $admins = $admins->where('name', 'like', '%' . $name . '%');
+            }
+            if ($request->has('email') && !empty($request->input('email'))) {
+                $email = $request->email;
+                $admins = $admins->where('email', 'like', '%' . $email . '%');
+            }
+            $admins = $admins->paginate(15);
 
-        $name = null;
-        $email = null;
-        $admins = Admin::latest('deleted_at')->onlyTrashed();
-        if ($request->has('name') && !empty($request->input('name'))) {
-            $name = $request->name;
-            $admins = $admins->where('name', 'like', '%' . $name . '%');
+            return view('backend.admin.admin.trash', compact('admins', 'name', 'email'));
+        } else {
+            $link = "admin.dashboard";
+            return view('error.403', compact('link'));
         }
-        if ($request->has('email') && !empty($request->input('email'))) {
-            $email = $request->email;
-            $admins = $admins->where('email', 'like', '%' . $email . '%');
-        }
-        $admins = $admins->paginate(15);
-
-        return view('backend.admin.admin.trash', compact('admins', 'name', 'email'));
     }
 
     public function restore(Request $request, $id)
     {
         if ($request->ajax()) {
-            $admin = Admin::withTrashed()->findOrFail($id);
+            if (auth()->user()->can('admin_trash')) {
+                $admin = Admin::withTrashed()->findOrFail($id);
 
-            DB::beginTransaction();
-            try {
+                DB::beginTransaction();
+                try {
 
-                if (!empty($admin)) {
-                    $admin->restore();
+                    if (!empty($admin)) {
+                        $admin->restore();
+                    }
+
+                    DB::commit();
+
+                    return response()->json(['type' => 'success', 'message' => "Successfully Restored"]);
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                 }
-
-                DB::commit();
-
-                return response()->json(['type' => 'success', 'message' => "Successfully Restored"]);
-            } catch (Exception $e) {
-                DB::rollback();
-                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -324,20 +347,23 @@ class AdminController extends Controller
     public function restoreSelected(Request $request, $ids)
     {
         if ($request->ajax()) {
+            if (auth()->user()->can('admin_trash')) {
+                DB::beginTransaction();
+                try {
 
-            DB::beginTransaction();
-            try {
+                    $ids = explode(",", $ids);
 
-                $ids = explode(",", $ids);
+                    Admin::withTrashed()->whereIn('id', $ids)->restore();
 
-                Admin::withTrashed()->whereIn('id', $ids)->restore();
+                    DB::commit();
 
-                DB::commit();
-
-                return response()->json(['type' => 'success', 'message' => "Successfully Restored"]);
-            } catch (Exception $e) {
-                DB::rollback();
-                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                    return response()->json(['type' => 'success', 'message' => "Successfully Restored"]);
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                }
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -347,19 +373,23 @@ class AdminController extends Controller
     public function permanentDelete(Request $request, $id)
     {
         if ($request->ajax()) {
-            $admin = Admin::withTrashed()->findOrFail($id);
+            if (auth()->user()->can('admin_trash')) {
+                $admin = Admin::withTrashed()->findOrFail($id);
 
-            DB::beginTransaction();
-            try {
+                DB::beginTransaction();
+                try {
 
-                if (!empty($admin)) {
-                    $admin->forceDelete();
+                    if (!empty($admin)) {
+                        $admin->forceDelete();
+                    }
+                    DB::commit();
+                    return response()->json(['type' => 'success', 'message' => "Successfully Removed"]);
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                 }
-                DB::commit();
-                return response()->json(['type' => 'success', 'message' => "Successfully Removed"]);
-            } catch (Exception $e) {
-                DB::rollback();
-                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -369,20 +399,21 @@ class AdminController extends Controller
     public function permanentDeleteSelected(Request $request, $ids)
     {
         if ($request->ajax()) {
+            if (auth()->user()->can('admin_trash')) {
+                DB::beginTransaction();
+                try {
 
-            DB::beginTransaction();
-            try {
+                    $ids = explode(",", $ids);
+                    Admin::withTrashed()->whereIn('id', $ids)->forceDelete();
 
-                $ids = explode(",", $ids);
-
-                Admin::withTrashed()->whereIn('id', $ids)->forceDelete();
-
-                DB::commit();
-
-                return response()->json(['type' => 'success', 'message' => "Successfully Removed"]);
-            } catch (Exception $e) {
-                DB::rollback();
-                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                    DB::commit();
+                    return response()->json(['type' => 'success', 'message' => "Successfully Removed"]);
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                }
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);

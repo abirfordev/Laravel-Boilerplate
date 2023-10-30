@@ -20,12 +20,12 @@
         <div class="card">
             {{-- Export and Add new Button --}}
             <div class="d-flex flex-wrap justify-content-end mt-2">
-                {{-- @can('admin_create') --}}
-                <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
-                    <i class='bx bx-plus me-1'></i>
-                    <span class="d-none d-sm-block">Add New Record</span>
-                </button>
-                {{-- @endcan --}}
+                @can('admin_create')
+                    <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
+                        <i class='bx bx-plus me-1'></i>
+                        <span class="d-none d-sm-block">Add New Record</span>
+                    </button>
+                @endcan
 
                 @can('admin_trash')
                     <a href="{{ route('admin.settings.admin.trash') }}" class="btn rounded-pill btn-outline-danger mt-1 me-1">
