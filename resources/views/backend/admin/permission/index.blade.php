@@ -20,7 +20,7 @@
         <div class="card">
             {{-- Export and Add new Button --}}
             <div class="d-flex flex-wrap justify-content-end mt-2">
-                <div class="btn-group" id="dropdown-icon-demo">
+                {{-- <div class="btn-group" id="dropdown-icon-demo">
                     <button type="button" class="btn rounded-pill btn-outline-info dropdown-toggle mt-1 me-1"
                         data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bx bxs-file-export me-1"></i>
@@ -38,11 +38,13 @@
                             </a>
                         </li>
                     </ul>
-                </div>
-                <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
-                    <i class='bx bx-plus me-1'></i>
-                    <span class="d-none d-sm-block">Add New Record</span>
-                </button>
+                </div> --}}
+                @can('permission_create')
+                    <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
+                        <i class='bx bx-plus me-1'></i>
+                        <span class="d-none d-sm-block">Add New Record</span>
+                    </button>
+                @endcan
             </div>
             {{-- / Export and Add new Button --}}
 
@@ -97,12 +99,18 @@
                                         class="badge rounded-pill {{ $data->status ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->status ? 'Active' : 'Inactive' }}</span>
                                 </td>
                                 <td>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-show text-primary view' title="View"></i>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-edit text-success edit' title="Edit"></i>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-trash text-danger delete' title="Delete"></i>
+                                    @can('permission_read')
+                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
+                                            class='bx bx-show text-primary view' title="View"></i>
+                                    @endcan
+                                    @can('permission_update')
+                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
+                                            class='bx bx-edit text-success edit' title="Edit"></i>
+                                    @endcan
+                                    @can('permission_delete')
+                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
+                                            class='bx bx-trash text-danger delete' title="Delete"></i>
+                                    @endcan
                                 </td>
 
 

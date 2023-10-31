@@ -20,7 +20,7 @@
         <div class="card">
             {{-- Export and Add new Button --}}
             <div class="d-flex flex-wrap justify-content-end mt-2">
-                <div class="btn-group" id="dropdown-icon-demo">
+                {{-- <div class="btn-group" id="dropdown-icon-demo">
                     <button type="button" class="btn rounded-pill btn-outline-info dropdown-toggle mt-1 me-1"
                         data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bx bxs-file-export me-1"></i>
@@ -38,7 +38,7 @@
                             </a>
                         </li>
                     </ul>
-                </div>
+                </div> --}}
                 @can('module_create')
                     <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
                         <i class='bx bx-plus me-1'></i>
