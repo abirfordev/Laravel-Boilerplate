@@ -20,20 +20,20 @@ class PermissionController extends Controller
      */
     public function index(Request $request)
     {
-        // if (auth()->user()->can('permission_read')) {
-        $name = null;
-        $permissions = AdminPermission::latest();
-        if ($request->has('name') && !empty($request->input('name'))) {
-            $name = $request->name;
-            $permissions = $permissions->where('name', 'like', '%' . $name . '%');
-        }
-        $permissions = $permissions->paginate(15);
+        if (auth()->user()->can('permission_read')) {
+            $name = null;
+            $permissions = AdminPermission::latest();
+            if ($request->has('name') && !empty($request->input('name'))) {
+                $name = $request->name;
+                $permissions = $permissions->where('name', 'like', '%' . $name . '%');
+            }
+            $permissions = $permissions->paginate(15);
 
-        return view('backend.admin.permission.index', compact('permissions', 'name'));
-        // } else {
-        //     $link = "admin.dashboard";
-        //     return view('error.403', compact('link'));
-        // }
+            return view('backend.admin.permission.index', compact('permissions', 'name'));
+        } else {
+            $link = "admin.dashboard";
+            return view('error.403', compact('link'));
+        }
     }
 
     /**

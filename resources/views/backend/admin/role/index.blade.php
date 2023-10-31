@@ -40,15 +40,20 @@
                     </ul>
                 </div>
 
-                <a href="{{ route('admin.role.create') }}" class="btn rounded-pill btn-primary mt-1 me-1">
-                    <i class='bx bx-plus me-1'></i>
-                    <span class="d-none d-sm-block">Add New Record</span>
-                </a>
+                @can('role_create')
+                    <a href="{{ route('admin.role.create') }}" class="btn rounded-pill btn-primary mt-1 me-1">
+                        <i class='bx bx-plus me-1'></i>
+                        <span class="d-none d-sm-block">Add New Record</span>
+                    </a>
+                @endcan
+                @can('role_trash')
+                    <a href="{{ route('admin.settings.role.trash') }}" class="btn rounded-pill btn-outline-danger mt-1 me-1">
+                        <i class='bx bx-trash me-1'></i>
+                        <span class="d-none d-sm-block">Trash</span>
+                    </a>
+                @endcan
 
-                <a href="{{ route('admin.settings.role.trash') }}" class="btn rounded-pill btn-outline-danger mt-1 me-1">
-                    <i class='bx bx-trash me-1'></i>
-                    <span class="d-none d-sm-block">Trash</span>
-                </a>
+
             </div>
             {{-- / Export and Add new Button --}}
 
@@ -95,13 +100,14 @@
                                 </td>
                                 <td>
                                     @if ($data->name !== 'Master Admin')
-                                        <a href={{ route('admin.role.edit', ['role' => $data->id]) }}>
+                                        <a {{ $can_update }} href={{ route('admin.role.edit', ['role' => $data->id]) }}>
 
                                             <i data-toggle="tooltip" class='bx bx-edit text-success edit'
                                                 title="Edit"></i>
                                         </a>
-                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                            class='bx bx-trash text-warning delete' title="Delete"></i>
+                                        <i {{ $can_delete }} style="cursor: pointer;" id="{{ $data->id }}"
+                                            data-toggle="tooltip" class='bx bx-trash text-warning delete'
+                                            title="Delete"></i>
                                     @endif
 
                                 </td>
