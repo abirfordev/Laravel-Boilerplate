@@ -39,15 +39,19 @@
                         </li>
                     </ul>
                 </div>
-                <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
-                    <i class='bx bx-plus me-1'></i>
-                    <span class="d-none d-sm-block">Add New Record</span>
-                </button>
+                @can('module_create')
+                    <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
+                        <i class='bx bx-plus me-1'></i>
+                        <span class="d-none d-sm-block">Add New Record</span>
+                    </button>
+                @endcan
+                @can('module_trash')
+                    <a href="{{ route('admin.settings.module.trash') }}" class="btn rounded-pill btn-outline-danger mt-1 me-1">
+                        <i class='bx bx-trash me-1'></i>
+                        <span class="d-none d-sm-block">Trash</span>
+                    </a>
+                @endcan
 
-                <a href="{{ route('admin.settings.module.trash') }}" class="btn rounded-pill btn-outline-danger mt-1 me-1">
-                    <i class='bx bx-trash me-1'></i>
-                    <span class="d-none d-sm-block">Trash</span>
-                </a>
             </div>
             {{-- / Export and Add new Button --}}
 
@@ -96,17 +100,19 @@
                                         class="badge rounded-pill {{ $data->status ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->status ? 'Active' : 'Inactive' }}</span>
                                 </td>
                                 <td>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-show text-primary view' title="View"></i>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-edit text-success edit' title="Edit"></i>
-                                    <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                        class='bx bx-trash text-warning delete' title="Delete"></i>
+                                    @can('module_read')
+                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
+                                            class='bx bx-show text-primary view' title="View"></i>
+                                    @endcan
+                                    @can('module_update')
+                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
+                                            class='bx bx-edit text-success edit' title="Edit"></i>
+                                    @endcan
+                                    @can('module_delete')
+                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
+                                            class='bx bx-trash text-warning delete' title="Delete"></i>
+                                    @endcan
                                 </td>
-
-
-
-
                             </tr>
                         @endforeach
                     </tbody>

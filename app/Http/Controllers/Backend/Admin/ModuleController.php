@@ -17,15 +17,20 @@ class ModuleController extends Controller
      */
     public function index(Request $request)
     {
-        $name = null;
-        $modules = Module::latest();
-        if ($request->has('name') && !empty($request->input('name'))) {
-            $name = $request->name;
-            $modules = $modules->where('name', 'like', '%' . $name . '%');
-        }
-        $modules = $modules->paginate(15);
+        if (auth()->user()->can('module_read')) {
+            $name = null;
+            $modules = Module::latest();
+            if ($request->has('name') && !empty($request->input('name'))) {
+                $name = $request->name;
+                $modules = $modules->where('name', 'like', '%' . $name . '%');
+            }
+            $modules = $modules->paginate(15);
 
-        return view('backend.admin.module.index', compact('modules', 'name'));
+            return view('backend.admin.module.index', compact('modules', 'name'));
+        } else {
+            $link = "admin.dashboard";
+            return view('error.403', compact('link'));
+        }
     }
 
     /**
@@ -33,10 +38,15 @@ class ModuleController extends Controller
      */
     public function create(Request $request)
     {
+
         if ($request->ajax()) {
-            $modules = Module::whereStatus(1)->get();
-            $view = View::make('backend.admin.module.create', compact('modules'))->render();
-            return response()->json(['html' => $view]);
+            if (auth()->user()->can('module_create')) {
+                $modules = Module::whereStatus(1)->get();
+                $view = View::make('backend.admin.module.create', compact('modules'))->render();
+                return response()->json(['html' => $view]);
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
+            }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
         }
@@ -48,44 +58,47 @@ class ModuleController extends Controller
     public function store(Request $request)
     {
         if ($request->ajax()) {
+            if (auth()->user()->can('module_create')) {
+                $rules = [
+                    'name' => 'required|unique:modules,name',
+                    'permission_slug' =>
+                    'required|unique:modules,permission_slug',
+                    'parent_module_id' => 'required_if:is_children,on',
+                ];
 
-            $rules = [
-                'name' => 'required|unique:modules,name',
-                'permission_slug' =>
-                'required|unique:modules,permission_slug',
-                'parent_module_id' => 'required_if:is_children,on',
-            ];
+                $validator = Validator::make($request->all(), $rules);
+                if ($validator->fails()) {
+                    return response()->json([
+                        'type' => 'error',
+                        'errors' => $validator->getMessageBag()->toArray()
+                    ]);
+                } else {
 
-            $validator = Validator::make($request->all(), $rules);
-            if ($validator->fails()) {
-                return response()->json([
-                    'type' => 'error',
-                    'errors' => $validator->getMessageBag()->toArray()
-                ]);
-            } else {
+                    DB::beginTransaction();
+                    try {
 
-                DB::beginTransaction();
-                try {
+                        $module = new Module();
+                        $module->name = $request->input('name');
+                        $module->url = $request->input('url');
+                        $module->permission_slug = $request->input('permission_slug');
+                        $module->is_children = $request->has('is_children') ? 1 : 0;;
+                        $module->is_label = $request->has('is_label') ? 1 : 0;
+                        $module->is_visibile_to_role = $request->has('is_visibile_to_role') ? 1 : 0;
+                        $module->parent_module_id =
+                            $request->has('is_children') ? $request->input('parent_module_id') : null;
 
-                    $module = new Module();
-                    $module->name = $request->input('name');
-                    $module->url = $request->input('url');
-                    $module->permission_slug = $request->input('permission_slug');
-                    $module->is_children = $request->has('is_children') ? 1 : 0;;
-                    $module->is_label = $request->has('is_label') ? 1 : 0;
-                    $module->is_visibile_to_role = $request->has('is_visibile_to_role') ? 1 : 0;
-                    $module->parent_module_id =
-                        $request->has('is_children') ? $request->input('parent_module_id') : null;
+                        $module->save();
 
-                    $module->save();
+                        DB::commit();
 
-                    DB::commit();
-
-                    return response()->json(['type' => 'success', 'message' => "Successfully Created"]);
-                } catch (Exception $e) {
-                    DB::rollback();
-                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                        return response()->json(['type' => 'success', 'message' => "Successfully Created"]);
+                    } catch (Exception $e) {
+                        DB::rollback();
+                        return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                    }
                 }
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -98,8 +111,12 @@ class ModuleController extends Controller
     public function show(Request $request, Module $module)
     {
         if ($request->ajax()) {
-            $view = View::make('backend.admin.module.view', compact('module'))->render();
-            return response()->json(['html' => $view]);
+            if (auth()->user()->can('module_read')) {
+                $view = View::make('backend.admin.module.view', compact('module'))->render();
+                return response()->json(['html' => $view]);
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
+            }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
         }
@@ -111,9 +128,13 @@ class ModuleController extends Controller
     public function edit(Request $request, Module $module)
     {
         if ($request->ajax()) {
-            $modules = Module::all();
-            $view = View::make('backend.admin.module.edit', compact('module', 'modules'))->render();
-            return response()->json(['html' => $view]);
+            if (auth()->user()->can('module_update')) {
+                $modules = Module::all();
+                $view = View::make('backend.admin.module.edit', compact('module', 'modules'))->render();
+                return response()->json(['html' => $view]);
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
+            }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
         }
@@ -125,44 +146,47 @@ class ModuleController extends Controller
     public function update(Request $request, Module $module)
     {
         if ($request->ajax()) {
+            if (auth()->user()->can('module_update')) {
+                $rules = [
+                    'name' => 'required|unique:modules,name,' . $module->id,
+                    'permission_slug' =>
+                    'required|unique:modules,permission_slug,' . $module->id,
+                    'parent_module_id' => 'required_if:is_children,on',
+                ];
 
-            $rules = [
-                'name' => 'required|unique:modules,name,' . $module->id,
-                'permission_slug' =>
-                'required|unique:modules,permission_slug,' . $module->id,
-                'parent_module_id' => 'required_if:is_children,on',
-            ];
+                $validator = Validator::make($request->all(), $rules);
+                if ($validator->fails()) {
+                    return response()->json([
+                        'type' => 'error',
+                        'errors' => $validator->getMessageBag()->toArray()
+                    ]);
+                } else {
 
-            $validator = Validator::make($request->all(), $rules);
-            if ($validator->fails()) {
-                return response()->json([
-                    'type' => 'error',
-                    'errors' => $validator->getMessageBag()->toArray()
-                ]);
-            } else {
+                    DB::beginTransaction();
+                    try {
 
-                DB::beginTransaction();
-                try {
+                        $module->name = $request->input('name');
+                        $module->url = $request->input('url');
+                        $module->permission_slug = $request->input('permission_slug');
+                        $module->is_children = $request->has('is_children') ? 1 : 0;;
+                        $module->is_label = $request->has('is_label') ? 1 : 0;
+                        $module->is_visibile_to_role = $request->has('is_visibile_to_role') ? 1 : 0;
+                        $module->parent_module_id =
+                            $request->has('is_children') ? $request->input('parent_module_id') : null;
 
-                    $module->name = $request->input('name');
-                    $module->url = $request->input('url');
-                    $module->permission_slug = $request->input('permission_slug');
-                    $module->is_children = $request->has('is_children') ? 1 : 0;;
-                    $module->is_label = $request->has('is_label') ? 1 : 0;
-                    $module->is_visibile_to_role = $request->has('is_visibile_to_role') ? 1 : 0;
-                    $module->parent_module_id =
-                        $request->has('is_children') ? $request->input('parent_module_id') : null;
+                        $module->status = $request->input('status');
+                        $module->save();
 
-                    $module->status = $request->input('status');
-                    $module->save();
+                        DB::commit();
 
-                    DB::commit();
-
-                    return response()->json(['type' => 'success', 'message' => "Successfully Updated"]);
-                } catch (Exception $e) {
-                    DB::rollback();
-                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                        return response()->json(['type' => 'success', 'message' => "Successfully Updated"]);
+                    } catch (Exception $e) {
+                        DB::rollback();
+                        return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                    }
                 }
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -175,15 +199,18 @@ class ModuleController extends Controller
     public function destroy(Request $request, Module $module)
     {
         if ($request->ajax()) {
-
-            DB::beginTransaction();
-            try {
-                $module->delete();
-                DB::commit();
-                return response()->json(['type' => 'success', 'message' => 'Successfully Deleted']);
-            } catch (Exception $e) {
-                DB::rollback();
-                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+            if (auth()->user()->can('module_delete')) {
+                DB::beginTransaction();
+                try {
+                    $module->delete();
+                    DB::commit();
+                    return response()->json(['type' => 'success', 'message' => 'Successfully Deleted']);
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                }
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -192,36 +219,44 @@ class ModuleController extends Controller
 
     public function trashList(Request $request)
     {
+        if (auth()->user()->can('module_trash')) {
+            $name = null;
+            $modules = Module::latest('deleted_at')->onlyTrashed();
+            if ($request->has('name') && !empty($request->input('name'))) {
+                $name = $request->name;
+                $modules = $modules->where('name', 'like', '%' . $name . '%');
+            }
+            $modules = $modules->paginate(15);
 
-        $name = null;
-        $modules = Module::latest('deleted_at')->onlyTrashed();
-        if ($request->has('name') && !empty($request->input('name'))) {
-            $name = $request->name;
-            $modules = $modules->where('name', 'like', '%' . $name . '%');
+            return view('backend.admin.module.trash', compact('modules', 'name'));
+        } else {
+            $link = "admin.dashboard";
+            return view('error.403', compact('link'));
         }
-        $modules = $modules->paginate(15);
-
-        return view('backend.admin.module.trash', compact('modules', 'name'));
     }
 
     public function restore(Request $request, $id)
     {
         if ($request->ajax()) {
-            $module = Module::withTrashed()->findOrFail($id);
+            if (auth()->user()->can('module_trash')) {
+                $module = Module::withTrashed()->findOrFail($id);
 
-            DB::beginTransaction();
-            try {
+                DB::beginTransaction();
+                try {
 
-                if (!empty($module)) {
-                    $module->restore();
+                    if (!empty($module)) {
+                        $module->restore();
+                    }
+
+                    DB::commit();
+
+                    return response()->json(['type' => 'success', 'message' => "Successfully Restored"]);
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                 }
-
-                DB::commit();
-
-                return response()->json(['type' => 'success', 'message' => "Successfully Restored"]);
-            } catch (Exception $e) {
-                DB::rollback();
-                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -231,20 +266,23 @@ class ModuleController extends Controller
     public function restoreSelected(Request $request, $ids)
     {
         if ($request->ajax()) {
+            if (auth()->user()->can('module_trash')) {
+                DB::beginTransaction();
+                try {
 
-            DB::beginTransaction();
-            try {
+                    $ids = explode(",", $ids);
 
-                $ids = explode(",", $ids);
+                    Module::withTrashed()->whereIn('id', $ids)->restore();
 
-                Module::withTrashed()->whereIn('id', $ids)->restore();
+                    DB::commit();
 
-                DB::commit();
-
-                return response()->json(['type' => 'success', 'message' => "Successfully Restored"]);
-            } catch (Exception $e) {
-                DB::rollback();
-                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                    return response()->json(['type' => 'success', 'message' => "Successfully Restored"]);
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                }
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -254,19 +292,23 @@ class ModuleController extends Controller
     public function permanentDelete(Request $request, $id)
     {
         if ($request->ajax()) {
-            $module = Module::withTrashed()->findOrFail($id);
+            if (auth()->user()->can('module_trash')) {
+                $module = Module::withTrashed()->findOrFail($id);
 
-            DB::beginTransaction();
-            try {
+                DB::beginTransaction();
+                try {
 
-                if (!empty($module)) {
-                    $module->forceDelete();
+                    if (!empty($module)) {
+                        $module->forceDelete();
+                    }
+                    DB::commit();
+                    return response()->json(['type' => 'success', 'message' => "Successfully Removed"]);
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                 }
-                DB::commit();
-                return response()->json(['type' => 'success', 'message' => "Successfully Removed"]);
-            } catch (Exception $e) {
-                DB::rollback();
-                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -276,20 +318,23 @@ class ModuleController extends Controller
     public function permanentDeleteSelected(Request $request, $ids)
     {
         if ($request->ajax()) {
+            if (auth()->user()->can('module_trash')) {
+                DB::beginTransaction();
+                try {
 
-            DB::beginTransaction();
-            try {
+                    $ids = explode(",", $ids);
 
-                $ids = explode(",", $ids);
+                    Module::withTrashed()->whereIn('id', $ids)->forceDelete();
 
-                Module::withTrashed()->whereIn('id', $ids)->forceDelete();
+                    DB::commit();
 
-                DB::commit();
-
-                return response()->json(['type' => 'success', 'message' => "Successfully Removed"]);
-            } catch (Exception $e) {
-                DB::rollback();
-                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                    return response()->json(['type' => 'success', 'message' => "Successfully Removed"]);
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                }
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
