@@ -58,10 +58,10 @@
                             <tr>
                                 <td></td>
                                 <td>{{ $key + 1 + ($logs->currentPage() - 1) * $logs->perPage() }}</td>
-                                <td>{{ $data->causer->type }}</td>
-                                <td>{{ $data->causer->name }}</td>
+                                <td>{{ $data->causer ? $data->causer->type : '' }}</td>
+                                <td>{{ $data->causer ? $data->causer->name : '' }}</td>
                                 <td>{{ $data->log_name }}</td>
-                                <td>{{ $data->causer->name . ' ' . $data->description }}</td>
+                                <td>{{ $data->causer ? $data->causer->name : '' . ' ' . $data->description }}</td>
                                 <td>{{ $data->created_at }}</td>
 
 
