@@ -61,7 +61,7 @@
                                 <td>{{ $data->causer ? $data->causer->type : '' }}</td>
                                 <td>{{ $data->causer ? $data->causer->name : '' }}</td>
                                 <td>{{ $data->log_name }}</td>
-                                <td>{{ $data->causer ? $data->causer->name : '' . ' ' . $data->description }}</td>
+                                <td>{{ ($data->causer ? $data->causer->name : '') . ' ' . $data->description }}</td>
                                 <td>{{ $data->created_at }}</td>
 
 

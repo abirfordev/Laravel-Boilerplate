@@ -24,6 +24,13 @@
             </a>
         </li>
 
+        <li class="menu-item {{ request()->is('admin/user*') ? 'active' : '' }}">
+            <a href="{{ route('admin.user.index') }}" class="menu-link">
+                <i class="menu-icon fa-solid fa-house"></i>
+                <div data-i18n="User">User</div>
+            </a>
+        </li>
+
         <!-- / Dashboards -->
 
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Web & Admin Settings</span></li>

@@ -23,6 +23,24 @@ Route::group(
 Route::resource('settings/admin', 'AdminController');
 // --/ Routes for Admin
 
+// Routes for User
+Route::group(
+    [
+        'controller' => 'UserController',
+        'prefix' => 'user',
+        'as' => 'user.',
+    ],
+    function () {
+        Route::get('/trash', 'trashList')->name('trash');
+        Route::get('restore/{id}', 'restore')->name('restore');
+        Route::get('restoreSelected/{ids}', 'restoreSelected')->name('restoreSelected');
+        Route::delete('permanentDelete/{id}', 'permanentDelete')->name('permanentDelete');
+        Route::delete('permanentDeleteSelected/{ids}', 'permanentDeleteSelected')->name('permanentDeleteSelected');
+    }
+);
+Route::resource('user', 'UserController');
+// --/ Routes for User
+
 // Routes for Activity Log
 Route::get('web-settings/activity-log', 'ActivityLogController@index')->name('activity-log.index');
 // --/ Routes for Activity Log
