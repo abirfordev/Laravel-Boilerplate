@@ -17,8 +17,13 @@ class SettingController extends Controller
      */
     public function index()
     {
-        $settings = Setting::all();
-        return view('backend.admin.setting.index', compact('settings'));
+        if (auth()->user()->can('setting_read')) {
+            $settings = Setting::all();
+            return view('backend.admin.setting.index', compact('settings'));
+        } else {
+            $link = "admin.dashboard";
+            return view('error.403', compact('link'));
+        }
     }
 
     /**
@@ -27,8 +32,12 @@ class SettingController extends Controller
     public function create(Request $request)
     {
         if ($request->ajax()) {
-            $view = View::make('backend.admin.setting.create')->render();
-            return response()->json(['html' => $view]);
+            if (auth()->user()->can('setting_create')) {
+                $view = View::make('backend.admin.setting.create')->render();
+                return response()->json(['html' => $view]);
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
+            }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
         }
@@ -40,37 +49,40 @@ class SettingController extends Controller
     public function store(Request $request)
     {
         if ($request->ajax()) {
+            if (auth()->user()->can('setting_create')) {
+                $rules = [
+                    'name' => 'required|unique:settings,name',
+                    'label' => 'required|unique:settings,label',
+                ];
 
-            $rules = [
-                'name' => 'required|unique:settings,name',
-                'label' => 'required|unique:settings,label',
-            ];
+                $validator = Validator::make($request->all(), $rules);
+                if ($validator->fails()) {
+                    return response()->json([
+                        'type' => 'error',
+                        'errors' => $validator->getMessageBag()->toArray()
+                    ]);
+                } else {
 
-            $validator = Validator::make($request->all(), $rules);
-            if ($validator->fails()) {
-                return response()->json([
-                    'type' => 'error',
-                    'errors' => $validator->getMessageBag()->toArray()
-                ]);
-            } else {
+                    DB::beginTransaction();
+                    try {
 
-                DB::beginTransaction();
-                try {
+                        $setting = new Setting();
+                        $setting->name = $request->input('name');
+                        $setting->label = $request->input('label');
+                        $setting->value = $request->input('value');
+                        $setting->instruction = $request->input('instruction');
+                        $setting->save();
 
-                    $setting = new Setting();
-                    $setting->name = $request->input('name');
-                    $setting->label = $request->input('label');
-                    $setting->value = $request->input('value');
-                    $setting->instruction = $request->input('instruction');
-                    $setting->save();
+                        DB::commit();
 
-                    DB::commit();
-
-                    return response()->json(['type' => 'success', 'message' => "Successfully Created"]);
-                } catch (Exception $e) {
-                    DB::rollback();
-                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                        return response()->json(['type' => 'success', 'message' => "Successfully Created"]);
+                    } catch (Exception $e) {
+                        DB::rollback();
+                        return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                    }
                 }
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
@@ -99,22 +111,25 @@ class SettingController extends Controller
     public function update(Request $request)
     {
         if ($request->ajax()) {
+            if (auth()->user()->can('setting_update')) {
+                DB::beginTransaction();
+                try {
 
-            DB::beginTransaction();
-            try {
+                    foreach ($request->input('settings') as $key => $value) {
+                        Setting::firstWhere('name', $key)->update([
+                            'value' => $value
+                        ]);
+                    }
 
-                foreach ($request->input('settings') as $key => $value) {
-                    Setting::firstWhere('name', $key)->update([
-                        'value' => $value
-                    ]);
+                    DB::commit();
+
+                    return response()->json(['type' => 'success', 'message' => "Successfully Created"]);
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
                 }
-
-                DB::commit();
-
-                return response()->json(['type' => 'success', 'message' => "Successfully Created"]);
-            } catch (Exception $e) {
-                DB::rollback();
-                return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
             }
         } else {
             return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);

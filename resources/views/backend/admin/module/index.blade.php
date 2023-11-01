@@ -100,18 +100,16 @@
                                         class="badge rounded-pill {{ $data->status ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->status ? 'Active' : 'Inactive' }}</span>
                                 </td>
                                 <td>
-                                    @can('module_read')
-                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                            class='bx bx-show text-primary view' title="View"></i>
-                                    @endcan
-                                    @can('module_update')
-                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                            class='bx bx-edit text-success edit' title="Edit"></i>
-                                    @endcan
-                                    @can('module_delete')
-                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                            class='bx bx-trash text-warning delete' title="Delete"></i>
-                                    @endcan
+
+                                    <i {{ $can_read }} style="cursor: pointer;" id="{{ $data->id }}"
+                                        data-toggle="tooltip" class='bx bx-show text-primary view' title="View"></i>
+
+                                    <i {{ $can_update }} style="cursor: pointer;" id="{{ $data->id }}"
+                                        data-toggle="tooltip" class='bx bx-edit text-success edit' title="Edit"></i>
+
+                                    <i {{ $can_delete }} style="cursor: pointer;" id="{{ $data->id }}"
+                                        data-toggle="tooltip" class='bx bx-trash text-warning delete' title="Delete"></i>
+
                                 </td>
                             </tr>
                         @endforeach

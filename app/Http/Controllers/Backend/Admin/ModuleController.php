@@ -26,7 +26,11 @@ class ModuleController extends Controller
             }
             $modules = $modules->paginate(15);
 
-            return view('backend.admin.module.index', compact('modules', 'name'));
+            $can_read = auth()->user()->can('module_read') ? "style=cursor:pointer;" : "style=display:none;";
+            $can_update = auth()->user()->can('module_update') ? "style=cursor:pointer;" : "style=display:none;";
+            $can_delete = auth()->user()->can('module_delete') ? "style=cursor:pointer;" : "style=display:none;";
+
+            return view('backend.admin.module.index', compact('modules', 'name', 'can_read', 'can_update', 'can_delete'));
         } else {
             $link = "admin.dashboard";
             return view('error.403', compact('link'));

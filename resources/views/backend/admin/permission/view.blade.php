@@ -4,7 +4,7 @@
             <tbody>
                 <tr>
                     <th>Module Name</th>
-                    <td> {{ $permission->module->name }} </td>
+                    <td> {{ $permission->module ? $data->module->name : '' }} </td>
                 </tr>
 
                 <tr>

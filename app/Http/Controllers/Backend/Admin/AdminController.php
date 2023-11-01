@@ -33,7 +33,11 @@ class AdminController extends Controller
             }
             $admins = $admins->paginate(15);
 
-            return view('backend.admin.admin.index', compact('admins', 'name', 'email'));
+            $can_read = auth()->user()->can('admin_read') ? "style=cursor:pointer;" : "style=display:none;";
+            $can_update = auth()->user()->can('admin_update') ? "style=cursor:pointer;" : "style=display:none;";
+            $can_delete = auth()->user()->can('admin_delete') ? "style=cursor:pointer;" : "style=display:none;";
+
+            return view('backend.admin.admin.index', compact('admins', 'name', 'email', 'can_read', 'can_update', 'can_delete'));
         } else {
             $link = "admin.dashboard";
             return view('error.403', compact('link'));

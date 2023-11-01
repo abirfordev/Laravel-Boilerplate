@@ -89,7 +89,7 @@
                                 <td></td>
                                 <td>{{ $key + 1 + ($permissions->currentPage() - 1) * $permissions->perPage() }}</td>
                                 <td>{{ $data->name }}</td>
-                                <td>{{ $data->module->name }}</td>
+                                <td>{{ $data->module ? $data->module->name : '' }}</td>
                                 <td>{{ $data->label }}</td>
                                 <td class="text-center"><span
                                         class="badge rounded-pill {{ $data->is_visibile_to_role ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->is_visibile_to_role ? 'Yes' : 'No' }}</span>
@@ -99,18 +99,16 @@
                                         class="badge rounded-pill {{ $data->status ? 'bg-label-success' : 'bg-label-danger' }} ">{{ $data->status ? 'Active' : 'Inactive' }}</span>
                                 </td>
                                 <td>
-                                    @can('permission_read')
-                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                            class='bx bx-show text-primary view' title="View"></i>
-                                    @endcan
-                                    @can('permission_update')
-                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                            class='bx bx-edit text-success edit' title="Edit"></i>
-                                    @endcan
-                                    @can('permission_delete')
-                                        <i style="cursor: pointer;" id="{{ $data->id }}" data-toggle="tooltip"
-                                            class='bx bx-trash text-danger delete' title="Delete"></i>
-                                    @endcan
+
+                                    <i {{ $can_read }} style="cursor: pointer;" id="{{ $data->id }}"
+                                        data-toggle="tooltip" class='bx bx-show text-primary view' title="View"></i>
+
+                                    <i {{ $can_update }} style="cursor: pointer;" id="{{ $data->id }}"
+                                        data-toggle="tooltip" class='bx bx-edit text-success edit' title="Edit"></i>
+
+                                    <i {{ $can_delete }} style="cursor: pointer;" id="{{ $data->id }}"
+                                        data-toggle="tooltip" class='bx bx-trash text-danger delete' title="Delete"></i>
+
                                 </td>
 
 

@@ -21,11 +21,12 @@
 
                 {{-- Add new Button --}}
                 <div class="d-flex flex-wrap justify-content-end mt-2">
-
-                    <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
-                        <i class='bx bx-plus me-1'></i>
-                        <span class="d-none d-sm-block">Add New Record</span>
-                    </button>
+                    @can('setting_create')
+                        <button class="btn rounded-pill btn-primary mt-1 me-1" type="button" onclick="create()">
+                            <i class='bx bx-plus me-1'></i>
+                            <span class="d-none d-sm-block">Add New Record</span>
+                        </button>
+                    @endcan
                 </div>
                 {{-- / Add new Button --}}
 
@@ -53,10 +54,12 @@
                                     <i class="fa-solid fa-arrow-rotate-right me-1"></i>
                                     Reset
                                 </button>
-                                <button class="btn btn-primary button-update" type="submit">
-                                    <i class="fa-solid fa-square-pen me-1"></i>
-                                    Update
-                                </button>
+                                @can('setting_update')
+                                    <button class="btn btn-primary button-update" type="submit">
+                                        <i class="fa-solid fa-square-pen me-1"></i>
+                                        Update
+                                    </button>
+                                @endcan
                             </div>
                         @endif
 

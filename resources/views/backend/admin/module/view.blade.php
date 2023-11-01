@@ -26,7 +26,7 @@
                 @if ($module->is_children && $module->parent_module_id != null)
                     <tr>
                         <th>Parent Module</th>
-                        <td>{{ $module->parent->name }}
+                        <td>{{ $module->parent ? $module->parent->name : '' }}
                         </td>
                     </tr>
                 @endif

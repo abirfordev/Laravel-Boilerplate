@@ -29,7 +29,11 @@ class PermissionController extends Controller
             }
             $permissions = $permissions->paginate(15);
 
-            return view('backend.admin.permission.index', compact('permissions', 'name'));
+            $can_read = auth()->user()->can('permission_read') ? "style=cursor:pointer;" : "style=display:none;";
+            $can_update = auth()->user()->can('permission_update') ? "style=cursor:pointer;" : "style=display:none;";
+            $can_delete = auth()->user()->can('permission_delete') ? "style=cursor:pointer;" : "style=display:none;";
+
+            return view('backend.admin.permission.index', compact('permissions', 'name', 'can_read', 'can_update', 'can_delete'));
         } else {
             $link = "admin.dashboard";
             return view('error.403', compact('link'));

@@ -105,9 +105,8 @@
                                             <i data-toggle="tooltip" class='bx bx-edit text-success edit'
                                                 title="Edit"></i>
                                         </a>
-                                        <i {{ $can_delete }} style="cursor: pointer;" id="{{ $data->id }}"
-                                            data-toggle="tooltip" class='bx bx-trash text-warning delete'
-                                            title="Delete"></i>
+                                        <i {{ $can_delete }} id="{{ $data->id }}" data-toggle="tooltip"
+                                            class='bx bx-trash text-warning delete' title="Delete"></i>
                                     @endif
 
                                 </td>

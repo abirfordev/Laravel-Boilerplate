@@ -30,11 +30,9 @@ class RoleController extends Controller
             $roles = $roles->paginate(15);
 
 
-            $can_read = auth()->user()->can('role_read') ? "" : "style=display:none";
-            $can_update = auth()->user()->can('role_update') ? "" :
-                "style=display:none";
-            $can_delete = auth()->user()->can('role_delete') ? "" :
-                "style=display:none";
+            $can_read = auth()->user()->can('role_read') ? "style=cursor:pointer;" : "style=display:none;";
+            $can_update = auth()->user()->can('role_update') ? "style=cursor:pointer;" : "style=display:none;";
+            $can_delete = auth()->user()->can('role_delete') ? "style=cursor:pointer;" : "style=display:none;";
 
             return view('backend.admin.role.index', compact('roles', 'name', 'can_read', 'can_update', 'can_delete'));
         } else {

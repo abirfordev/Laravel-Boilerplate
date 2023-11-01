@@ -6,11 +6,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Alumni extends Authenticatable
 {
-    use  HasFactory, SoftDeletes;
+    use  HasFactory, SoftDeletes, LogsActivity;
 
     /**
      * The attributes that are mass assignable.
@@ -42,4 +43,13 @@ class Alumni extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->useLogName('Alumni')
+            ->setDescriptionForEvent(fn (string $eventName) => "has been {$eventName} a alumni")
+            ->logOnly(['*']);
+        // Chain fluent methods for configuration options
+    }
 }
