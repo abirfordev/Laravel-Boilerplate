@@ -1,5 +1,5 @@
 @extends('auth.layout.master')
-@section('title', 'Admin Login')
+@section('title', 'User Login')
 @section('content')
     <div class="container-xxl">
         <div class="authentication-wrapper authentication-basic container-p-y">
@@ -16,11 +16,11 @@
                         <!-- /Logo -->
                         <h4 class="mb-2 text-center">Welcome to CSEAA-PU</h4>
 
-                        <h6 class="mb-2 text-center">Admin Login</h6>
+                        <h6 class="mb-2 text-center">User Login</h6>
 
 
                         <form id="formAuthentication" class="mb-3" autocomplete="off"
-                            action="{{ route('admin.loginAdmin') }}" method="POST">
+                            action="{{ route('user.loginUser') }}" method="POST">
                             @csrf
                             @if ($errors->has('message'))
                                 <div class="alert alert-danger" role="alert">{{ $errors->first('message') }}</div>

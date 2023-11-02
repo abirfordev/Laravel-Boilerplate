@@ -44,6 +44,32 @@ Route::group(
 );
 
 
+Route::group(
+    [
+        'namespace' => 'Auth\User',
+        'prefix' => 'user',
+        'as' => 'user.',
+    ],
+    function () {
+        Route::get('/login', 'LoginController@login')->name('login');
+        Route::post('/loginUser', 'LoginController@loginUser')->name('loginUser');
+        Route::get('/logout', 'LoginController@logout')->name('logout');
+    }
+);
+
+Route::group(
+    [
+        'namespace' => 'Backend\User',
+        'prefix' => 'user',
+        'as' => 'user.',
+        'middleware' => 'auth:user'
+    ],
+    function () {
+        require(base_path('routes/backend/user.php'));
+    }
+);
+
+
 // Auth::routes();
 
 // Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
