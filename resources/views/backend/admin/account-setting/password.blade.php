@@ -1,4 +1,4 @@
-@extends('backend.admin.layout.master')
+@extends('layouts.backend.admin.master')
 @section('title', 'Change Password')
 @section('nav-icon-title')
     <i class="fa-solid fa-lock m-2"></i>

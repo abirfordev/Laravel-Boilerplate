@@ -4,7 +4,7 @@
     data-assets-path="../assets/" data-template="vertical-menu-template-free">
 
 <head>
-    @include('auth.layout.head')
+    @include('layouts.common.head')
 </head>
 
 <body>
@@ -14,7 +14,7 @@
 
 
     <!-- Footer JS-->
-    @include('auth.layout.footer-js')
+    @include('layouts.common.footer-js')
     <!-- / Footer JS-->
 
 </body>

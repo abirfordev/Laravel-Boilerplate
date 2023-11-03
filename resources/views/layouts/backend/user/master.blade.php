@@ -4,7 +4,7 @@
     data-assets-path="/assets/" data-template="vertical-menu-template-free">
 
 <head>
-    @include('backend.admin.layout.head')
+    @include('layouts.common.head')
 </head>
 
 <body>
@@ -13,14 +13,14 @@
         <div class="layout-container">
 
             <!-- Sidebar -->
-            @include('backend.admin.layout.sidebar')
+            @include('layouts.backend.user.sidebar')
             <!-- / Sidebar -->
 
             <!-- Layout container -->
             <div class="layout-page">
 
                 <!-- Topbar -->
-                @include('backend.admin.layout.topbar')
+                @include('layouts.backend.user.topbar')
                 <!-- / Topbar -->
 
                 <!-- Content wrapper -->
@@ -31,11 +31,11 @@
                     <!-- / Content -->
 
                     <!-- Modal -->
-                    @include('backend.admin.layout.modal')
+                    @include('layouts.common.modal')
                     <!-- / Modal -->
 
                     <!-- Footer -->
-                    @include('backend.admin.layout.footer')
+                    @include('layouts.common.footer')
                     <!-- / Footer -->
 
                     <div class="content-backdrop fade"></div>
@@ -51,7 +51,7 @@
     <!-- / Layout wrapper -->
 
     <!-- Footer JS-->
-    @include('backend.admin.layout.footer-js')
+    @include('layouts.common.footer-js')
     <!-- / Footer JS-->
 
 </body>

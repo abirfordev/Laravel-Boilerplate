@@ -1,4 +1,4 @@
-@extends('backend.admin.layout.master')
+@extends('layouts.backend.admin.master')
 @section('title', 'Trash Role')
 @section('nav-icon-title')
     <i class="fa-solid fa-user-check m-2"></i>

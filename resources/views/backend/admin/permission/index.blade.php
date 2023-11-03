@@ -1,4 +1,4 @@
-@extends('backend.admin.layout.master')
+@extends('layouts.backend.admin.master')
 @section('title', 'Permission')
 @section('nav-icon-title')
     <i class="fa-solid fa-person-circle-exclamation m-2"></i>

@@ -1,4 +1,4 @@
-@extends('auth.layout.master')
+@extends('layouts.auth.master')
 @section('title', 'User Login')
 @section('content')
     <div class="container-xxl">

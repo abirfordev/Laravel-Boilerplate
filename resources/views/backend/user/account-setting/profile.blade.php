@@ -1,4 +1,4 @@
-@extends('backend.user.layout.master')
+@extends('layouts.backend.user.master')
 @section('title', 'Profile')
 @section('nav-icon-title')
     <i class="fa-solid fa-user m-2"></i>

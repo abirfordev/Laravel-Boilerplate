@@ -1,4 +1,4 @@
-@extends('backend.admin.layout.master')
+@extends('layouts.backend.admin.master')
 @section('title', 'Setting')
 @section('nav-icon-title')
     <i class="fa-solid fa-screwdriver-wrench m-2"></i>
