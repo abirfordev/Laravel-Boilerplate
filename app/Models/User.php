@@ -51,7 +51,8 @@ class User extends Authenticatable
         return LogOptions::defaults()
             ->useLogName('User')
             ->setDescriptionForEvent(fn (string $eventName) => "has been {$eventName} a user")
-            ->logOnly(['*']);
+            ->logOnly(['*'])
+            ->dontLogIfAttributesChangedOnly(['remember_token']);
         // Chain fluent methods for configuration options
     }
 }

@@ -49,7 +49,8 @@ class Alumni extends Authenticatable
         return LogOptions::defaults()
             ->useLogName('Alumni')
             ->setDescriptionForEvent(fn (string $eventName) => "has been {$eventName} a alumni")
-            ->logOnly(['*']);
+            ->logOnly(['*'])
+            ->dontLogIfAttributesChangedOnly(['remember_token']);
         // Chain fluent methods for configuration options
     }
 }

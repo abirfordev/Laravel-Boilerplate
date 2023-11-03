@@ -107,6 +107,8 @@
                                     @if ($data->email !== 'masteradmin@admin.com')
                                         <i {{ $can_update }} id="{{ $data->id }}" data-toggle="tooltip"
                                             class='bx bx-edit text-success edit' title="Edit"></i>
+                                        <i {{ $can_update }} id="{{ $data->id }}" data-toggle="tooltip"
+                                            class='bx bxs-lock-alt text-info change_password' title="Change Password"></i>
                                         <i {{ $can_delete }} style="cursor: pointer;" id="{{ $data->id }}"
                                             data-toggle="tooltip" class='bx bx-trash text-warning delete'
                                             title="Delete"></i>
@@ -234,6 +236,12 @@
             $("#base-table").on("click", ".edit", function() {
                 var id = $(this).attr('id');
                 edit_form_modal('/admin/settings/admin', id)
+            });
+
+            // Change Password Form
+            $("#base-table").on("click", ".change_password", function() {
+                var id = $(this).attr('id');
+                edit_others_form_modal('/admin/settings/admin/password', id, 'Change Password')
             });
 
             // Delete

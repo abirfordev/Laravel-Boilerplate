@@ -245,6 +245,55 @@ class UserController extends Controller
         }
     }
 
+    public function password(Request $request, User $user)
+    {
+        if ($request->ajax()) {
+            if (auth()->user()->can('user_update')) {
+                $view = View::make('backend.admin.user.password', compact('user'))->render();
+                return response()->json(['html' => $view]);
+            } else {
+                abort(403, 'Sorry, you are not authorized to access this page');
+            }
+        } else {
+            return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
+        }
+    }
+
+    public function passwordUpdate(Request $request, User $user)
+    {
+        if ($request->ajax()) {
+
+            $rules = [
+                'password' => 'required',
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'type' => 'error',
+                    'errors' => $validator->getMessageBag()->toArray()
+                ]);
+            } else {
+
+                try {
+
+                    $user->password =  Hash::make($request->input('password'));
+
+                    $user->save();
+
+                    DB::commit();
+
+                    return response()->json(['type' => 'success', 'message' => "Successfully change pasword"]);
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                }
+            }
+        } else {
+            return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
+        }
+    }
+
     public function trashList(Request $request)
     {
         if (auth()->user()->can('user_trash')) {

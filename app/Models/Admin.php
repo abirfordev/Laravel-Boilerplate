@@ -50,7 +50,8 @@ class Admin extends Authenticatable
         return LogOptions::defaults()
             ->useLogName('Admin')
             ->setDescriptionForEvent(fn (string $eventName) => "has been {$eventName} a admin")
-            ->logOnly(['*']);
+            ->logOnly(['*'])
+            ->dontLogIfAttributesChangedOnly(['remember_token']);
         // Chain fluent methods for configuration options
     }
 }

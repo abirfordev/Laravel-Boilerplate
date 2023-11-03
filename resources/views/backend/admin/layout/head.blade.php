@@ -40,6 +40,7 @@
 
 
     <!-- Page CSS -->
+    <link rel="stylesheet" href="{{ asset('/assets/vendor/css/pages/page-auth.css') }}" />
     <link rel="stylesheet" href="{{ asset('/assets/vendor/css/pages/page-misc.css') }}">
 
     <!-- Helpers -->

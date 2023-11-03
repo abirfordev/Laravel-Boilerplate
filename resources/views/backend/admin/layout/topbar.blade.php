@@ -22,7 +22,7 @@
             <li class="nav-item navbar-dropdown dropdown-user dropdown">
                 <div class="nav-link dropdown-toggle hide-arrow" data-bs-toggle="dropdown">
                     <div class="avatar avatar-online">
-                        <img src="{{ asset(Auth::user()->image) }}" alt class="w-px-40 h-auto rounded-circle" />
+                        <img src="{{ asset(Auth::user()->image) }}" alt class="w-100 rounded-circle" />
 
                     </div>
                 </div>
@@ -32,8 +32,7 @@
                             <div class="d-flex">
                                 <div class="flex-shrink-0 me-3">
                                     <div class="avatar avatar-online">
-                                        <img src="{{ asset(Auth::user()->image) }}" alt
-                                            class="w-px-40 h-auto rounded-circle" />
+                                        <img src="{{ asset(Auth::user()->image) }}" alt class="w-100 rounded-circle" />
                                     </div>
                                 </div>
                                 <div class="flex-grow-1">
@@ -47,14 +46,14 @@
                         <div class="dropdown-divider"></div>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="bx bx-user me-2"></i>
+                        <a class="dropdown-item" href="{{ route('admin.profile') }}">
+                            <i class="fa-solid fa-user me-2"></i>
                             <span class="align-middle">Profile</span>
                         </a>
                     </li>
                     <li>
-                        <a class="dropdown-item" href="#">
-                            <i class="bx bx-cog me-2"></i>
+                        <a class="dropdown-item" href="{{ route('admin.password') }}">
+                            <i class="fa-solid fa-lock me-2"></i>
                             <span class="align-middle">Change Password</span>
                         </a>
                     </li>

@@ -71,7 +71,7 @@ function store_data(route) {
                                 title: "Error!",
                                 text: data.responseJSON.message,
                                 showConfirmButton: false,
-                                timer: 5000,
+                                timer: 3000,
                             });
                         },
                     }),
@@ -81,16 +81,16 @@ function store_data(route) {
                 if (response.type === "success") {
                     // window.location.href = "/admin/demo";
                     $("#create")[0].reset();
-                    location.reload();
-                    $("#base_modal").modal("hide");
 
                     Swal.fire({
                         icon: "success",
                         title: "That's Great!",
                         text: response.message,
                         showConfirmButton: false,
-                        timer: 5000,
+                        timer: 3000,
                     });
+                    location.reload();
+                    $("#base_modal").modal("hide");
                 } else if (response.type === "error") {
                     if (response.errors) {
                         $.each(response.errors, function (key, val) {
@@ -103,7 +103,7 @@ function store_data(route) {
                         title: "Error!",
                         text: "Something going to wrong...",
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 3000,
                     });
                 }
             });
@@ -191,7 +191,7 @@ function update_data(route, id) {
                                 title: "Error!",
                                 text: data.responseJSON.message,
                                 showConfirmButton: false,
-                                timer: 5000,
+                                timer: 3000,
                             });
                         },
                     }),
@@ -200,16 +200,16 @@ function update_data(route, id) {
             }).then(() => {
                 if (response.type === "success") {
                     // window.location.href = "/admin/demo";
-                    location.reload();
-                    $("#base_modal").modal("hide");
 
                     Swal.fire({
                         icon: "success",
                         title: "That's Great!",
                         text: response.message,
                         showConfirmButton: false,
-                        timer: 5000,
+                        timer: 3000,
                     });
+                    location.reload();
+                    $("#base_modal").modal("hide");
                 } else if (response.type === "error") {
                     if (response.errors) {
                         $.each(response.errors, function (key, val) {
@@ -222,7 +222,103 @@ function update_data(route, id) {
                         title: "Error!",
                         text: "Something going to wrong...",
                         showConfirmButton: false,
-                        timer: 2000,
+                        timer: 3000,
+                    });
+                }
+            });
+        },
+    });
+}
+
+function edit_others_form_modal(route, id, title) {
+    $("#modal_data").empty();
+    $(".modal-title").text(title);
+
+    $.ajax({
+        url: route + "/" + id,
+        type: "get",
+        success: function (data) {
+            $("#modal_data").html(data.html);
+            $("#base_modal").modal("show"); // show bootstrap modal
+        },
+        error: function (result) {
+            $("#modal_data").html("Sorry Cannot Load Data");
+        },
+    });
+}
+
+function update_others_form(route, id, text, confirmButtonText) {
+    $("#status").html("");
+    $(".error").empty();
+    $("#edit").validate({
+        submitHandler: function (form) {
+            var myData = new FormData($("#edit")[0]);
+            myData.append("_token", CSRF_TOKEN);
+
+            let response = "";
+
+            Swal.fire({
+                title: "Are you sure?",
+                text: text,
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonText: confirmButtonText,
+                showLoaderOnConfirm: true,
+                buttonsStyling: false,
+                customClass: {
+                    confirmButton: "btn btn-info me-3",
+                    cancelButton: "btn btn-secondary",
+                },
+                preConfirm: (t) =>
+                    $.ajax({
+                        url: route + "/" + id,
+                        type: "POST",
+                        data: myData,
+                        dataType: "json",
+                        cache: false,
+                        processData: false,
+                        contentType: false,
+                        success: function (data) {
+                            response = data;
+                        },
+                        error: function (data) {
+                            Swal.fire({
+                                icon: "error",
+                                title: "Error!",
+                                text: data.responseJSON.message,
+                                showConfirmButton: false,
+                                timer: 3000,
+                            });
+                        },
+                    }),
+                backdrop: !0,
+                allowOutsideClick: () => !Swal.isLoading(),
+            }).then(() => {
+                if (response.type === "success") {
+                    // window.location.href = "/admin/demo";
+
+                    Swal.fire({
+                        icon: "success",
+                        title: "That's Great!",
+                        text: response.message,
+                        showConfirmButton: false,
+                        timer: 3000,
+                    });
+                    location.reload();
+                    $("#base_modal").modal("hide");
+                } else if (response.type === "error") {
+                    if (response.errors) {
+                        $.each(response.errors, function (key, val) {
+                            $("#error_" + key).html(val);
+                        });
+                    }
+                    $("#status").html(response.message);
+                    Swal.fire({
+                        icon: "error",
+                        title: "Error!",
+                        text: "Something going to wrong...",
+                        showConfirmButton: false,
+                        timer: 3000,
                     });
                 }
             });
@@ -264,7 +360,7 @@ function soft_delete(route, id) {
                         title: "Error!",
                         text: data.responseJSON.message,
                         showConfirmButton: false,
-                        timer: 5000,
+                        timer: 3000,
                     });
                 },
             }),
@@ -272,26 +368,24 @@ function soft_delete(route, id) {
         backdrop: !0,
         allowOutsideClick: () => !Swal.isLoading(),
     }).then(() => {
-        console.log(response);
         if (response.type === "success") {
             //window.location.href = "/admin/demo";
-
-            location.reload();
 
             Swal.fire({
                 icon: "success",
                 title: "That's Great!",
                 text: response.message,
                 showConfirmButton: false,
-                timer: 5000,
+                timer: 3000,
             });
+            location.reload();
         } else if (response.type === "error") {
             Swal.fire({
                 icon: "error",
                 title: "Error!",
                 text: "Deleting failed",
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 3000,
             });
         }
     });
@@ -330,7 +424,7 @@ function restore_single(route, id) {
                         title: "Error!",
                         text: data.responseJSON.message,
                         showConfirmButton: false,
-                        timer: 5000,
+                        timer: 3000,
                     });
                 },
             }),
@@ -341,22 +435,21 @@ function restore_single(route, id) {
         if (response.type === "success") {
             //window.location.href = "/admin/demo";
 
-            location.reload();
-
             Swal.fire({
                 icon: "success",
                 title: "That's Great!",
                 text: response.message,
                 showConfirmButton: false,
-                timer: 5000,
+                timer: 3000,
             });
+            location.reload();
         } else if (response.type === "error") {
             Swal.fire({
                 icon: "error",
                 title: "Error!",
                 text: "Restoring failed",
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 3000,
             });
         }
     });
@@ -396,7 +489,7 @@ function restore_selected(route, ids) {
                             title: "Error!",
                             text: data.responseJSON.message,
                             showConfirmButton: false,
-                            timer: 5000,
+                            timer: 3000,
                         });
                     },
                 }),
@@ -407,22 +500,21 @@ function restore_selected(route, ids) {
             if (response.type === "success") {
                 //window.location.href = "/admin/demo";
 
-                location.reload();
-
                 Swal.fire({
                     icon: "success",
                     title: "That's Great!",
                     text: response.message,
                     showConfirmButton: false,
-                    timer: 5000,
+                    timer: 3000,
                 });
+                location.reload();
             } else if (response.type === "error") {
                 Swal.fire({
                     icon: "error",
                     title: "Error!",
                     text: "Restoring failed",
                     showConfirmButton: false,
-                    timer: 2000,
+                    timer: 3000,
                 });
             }
         });
@@ -471,7 +563,7 @@ function permanent_delete_single(route, id) {
                         title: "Error!",
                         text: data.responseJSON.message,
                         showConfirmButton: false,
-                        timer: 5000,
+                        timer: 3000,
                     });
                 },
             }),
@@ -482,22 +574,21 @@ function permanent_delete_single(route, id) {
         if (response.type === "success") {
             //window.location.href = "/admin/demo";
 
-            location.reload();
-
             Swal.fire({
                 icon: "success",
                 title: "That's Great!",
                 text: response.message,
                 showConfirmButton: false,
-                timer: 5000,
+                timer: 3000,
             });
+            location.reload();
         } else if (response.type === "error") {
             Swal.fire({
                 icon: "error",
                 title: "Error!",
                 text: "Removing failed",
                 showConfirmButton: false,
-                timer: 2000,
+                timer: 3000,
             });
         }
     });
@@ -538,7 +629,7 @@ function permanent_delete_selected(route, ids) {
                             title: "Error!",
                             text: data.responseJSON.message,
                             showConfirmButton: false,
-                            timer: 5000,
+                            timer: 3000,
                         });
                     },
                 }),
@@ -549,22 +640,21 @@ function permanent_delete_selected(route, ids) {
             if (response.type === "success") {
                 //window.location.href = "/admin/demo";
 
-                location.reload();
-
                 Swal.fire({
                     icon: "success",
                     title: "That's Great!",
                     text: response.message,
                     showConfirmButton: false,
-                    timer: 5000,
+                    timer: 3000,
                 });
+                location.reload();
             } else if (response.type === "error") {
                 Swal.fire({
                     icon: "error",
                     title: "Error!",
                     text: "Removing failed",
                     showConfirmButton: false,
-                    timer: 2000,
+                    timer: 3000,
                 });
             }
         });
