@@ -5,7 +5,7 @@
 
 <head>
     @section('title', 'Unauthorized')
-    @include('backend.admin.layout.head')
+    @include('layouts.common.head')
 </head>
 
 <body>
@@ -33,7 +33,7 @@
     <!-- / Content -->
 
     <!-- Footer JS-->
-    @include('backend.admin.layout.footer-js')
+    @include('layouts.common.footer-js')
     <!-- / Footer JS-->
 
 </body>

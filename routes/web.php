@@ -53,7 +53,6 @@ Route::group(
     function () {
         Route::get('/login', 'LoginController@login')->name('login');
         Route::post('/loginUser', 'LoginController@loginUser')->name('loginUser');
-        Route::get('/logout', 'LoginController@logout')->name('logout');
     }
 );
 
@@ -62,12 +61,26 @@ Route::group(
         'namespace' => 'Backend\User',
         'prefix' => 'user',
         'as' => 'user.',
-        'middleware' => 'auth:user'
+        'middleware' => ['auth:user', 'is-set-default-password']
     ],
     function () {
         require(base_path('routes/backend/user.php'));
     }
 );
+
+Route::group(
+    [
+        'prefix' => 'user',
+        'as' => 'user.',
+        'middleware' => 'auth:user'
+    ],
+    function () {
+        Route::get('logout', 'Auth\User\LoginController@logout')->name('logout');
+        Route::patch('change_default_password/{id}', 'Backend\User\DashboardController@change_default_password')->name('change_default_password');
+    }
+);
+
+
 
 
 // Auth::routes();

@@ -152,6 +152,45 @@ class DashboardController extends Controller
         }
     }
 
+    public function change_default_password(Request $request, $id)
+    {
+        if ($request->ajax()) {
+
+            $rules = [
+                'password' => 'required',
+            ];
+
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json([
+                    'type' => 'error',
+                    'errors' => $validator->getMessageBag()->toArray()
+                ]);
+            } else {
+
+                $user = User::findOrFail(auth()->user()->id);
+
+
+                DB::beginTransaction();
+                try {
+
+                    $user->password =  Hash::make($request->input('password'));
+                    $user->is_default_password = 0;
+                    $user->save();
+
+                    DB::commit();
+
+                    return response()->json(['type' => 'success', 'message' => "Successfully change pasword"]);
+                } catch (Exception $e) {
+                    DB::rollback();
+                    return response()->json(['type' => 'error', 'message' => "<div class='alert alert-danger'>" . $e->getMessage() . "</div>"]);
+                }
+            }
+        } else {
+            return response()->json(['status' => 'false', 'message' => "Access only ajax request"]);
+        }
+    }
+
     /**
      * Show the form for creating a new resource.
      */

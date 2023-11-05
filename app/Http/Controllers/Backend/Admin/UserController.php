@@ -95,6 +95,7 @@ class UserController extends Controller
                         $user->gender = $request->input('gender');
                         $user->image = $file_path;
                         $user->password = Hash::make('123456');
+                        $user->is_default_password = 1;
                         $user->save();
 
                         DB::commit();
@@ -278,7 +279,7 @@ class UserController extends Controller
                 try {
 
                     $user->password =  Hash::make($request->input('password'));
-
+                    $user->is_default_password = 1;
                     $user->save();
 
                     DB::commit();

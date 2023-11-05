@@ -70,26 +70,4 @@
             </div>
         </div>
     </div>
-
-    {{-- <script>
-        $(function() {
-            "use strict";
-            var t = document.querySelectorAll(".form-password-toggle i");
-            null != t &&
-                t.forEach(function(t) {
-                    t.addEventListener("click", function(e) {
-                        e.preventDefault();
-                        var n = t.closest(".form-password-toggle"),
-                            i = n.querySelector("i"),
-                            o = n.querySelector("input");
-                        "text" === o.getAttribute("type") ?
-                            (o.setAttribute("type", "password"),
-                                i.classList.replace("bx-show", "bx-hide")) :
-                            "password" === o.getAttribute("type") &&
-                            (o.setAttribute("type", "text"),
-                                i.classList.replace("bx-hide", "bx-show"));
-                    });
-                });
-        });
-    </script> --}}
 @endsection
