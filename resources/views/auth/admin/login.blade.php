@@ -14,7 +14,7 @@
                                 width="150" alt="">
                         </div>
                         <!-- /Logo -->
-                        <h4 class="mb-2 text-center">Welcome to CSEAA-PU</h4>
+                        <h4 class="mb-2 text-center">Welcome to {{ config('settings.website_full_name') }}</h4>
 
                         <h6 class="mb-2 text-center">Admin Login</h6>
 

@@ -13,9 +13,19 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// Route::get('/', function () {
+//     return view('frontend.home');
+// });
+
+Route::group(
+    [
+        'namespace' => 'Frontend',
+        'as' => 'frontend.'
+    ],
+    function () {
+        require base_path('routes/frontend/home.php');
+    }
+);
 
 
 Route::group(
@@ -79,8 +89,6 @@ Route::group(
         Route::patch('change_default_password/{id}', 'Backend\User\DashboardController@change_default_password')->name('change_default_password');
     }
 );
-
-
 
 
 // Auth::routes();
