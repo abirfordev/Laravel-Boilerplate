@@ -11,7 +11,7 @@ class ActivityLogController extends Controller
     public function index(Request $request)
     {
         if (auth()->user()->can('activity_log_read')) {
-            $logs = Activity::latest()->paginate(10);
+            $logs = Activity::with('causer')->latest()->paginate(10);
             return view('backend.admin.activity-log.index', compact('logs'));
         } else {
             $link = "admin.dashboard";

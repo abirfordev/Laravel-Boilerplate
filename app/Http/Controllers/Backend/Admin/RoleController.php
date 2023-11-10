@@ -46,7 +46,7 @@ class RoleController extends Controller
     public function create()
     {
         if (auth()->user()->can('role_create')) {
-            $modules = Module::whereIsLabel(0)->whereIsVisibileToRole(1)->whereStatus(1)->get();
+            $modules = Module::with('visible_permission')->whereIsLabel(0)->whereIsVisibileToRole(1)->whereStatus(1)->get();
             return view('backend.admin.role.create', compact('modules'));
         } else {
             $link = "admin.dashboard";
@@ -109,7 +109,7 @@ class RoleController extends Controller
     public function edit(Role $role)
     {
         if (auth()->user()->can('role_update')) {
-            $modules = Module::whereIsLabel(0)->whereIsVisibileToRole(1)->get();
+            $modules = Module::with('visible_permission')->whereIsLabel(0)->whereIsVisibileToRole(1)->get();
             return view('backend.admin.role.edit', compact('role', 'modules'));
         } else {
             $link = "admin.dashboard";

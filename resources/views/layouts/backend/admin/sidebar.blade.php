@@ -26,7 +26,7 @@
 
         <li class="menu-item {{ request()->is('admin/user*') ? 'active' : '' }}">
             <a href="{{ route('admin.user.index') }}" class="menu-link">
-                <i class="menu-icon fa-solid fa-house"></i>
+                <i class="menu-icon fa-solid fa-user"></i>
                 <div data-i18n="User">User</div>
             </a>
         </li>

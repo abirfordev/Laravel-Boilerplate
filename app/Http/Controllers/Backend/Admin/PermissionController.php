@@ -22,7 +22,7 @@ class PermissionController extends Controller
     {
         if (auth()->user()->can('permission_read')) {
             $name = null;
-            $permissions = AdminPermission::latest();
+            $permissions = AdminPermission::latest()->with('module');
             if ($request->has('name') && !empty($request->input('name'))) {
                 $name = $request->name;
                 $permissions = $permissions->where('name', 'like', '%' . $name . '%');
