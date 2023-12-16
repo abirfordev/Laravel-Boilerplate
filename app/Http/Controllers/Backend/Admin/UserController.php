@@ -18,7 +18,7 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        if (auth()->user()->can('user')) {
+        if (auth()->user()->can('user_read')) {
             $name = null;
             $email = null;
             $users = User::latest();

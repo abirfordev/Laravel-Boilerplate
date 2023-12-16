@@ -100,3 +100,25 @@ Route::group(
 );
 Route::resource('settings/role', 'RoleController');
 // --/ Routes for Role
+
+// Routes for Alumni
+Route::group(
+    [
+        'controller' => 'AlumniController',
+        'prefix' => 'alumni',
+        'as' => 'alumni.',
+    ],
+    function () {
+        Route::get('/password/{alumni}', 'password')->name('password');
+        Route::patch('passwordUpdate/{alumni}', 'passwordUpdate')->name('password.update');
+        Route::get('/trash', 'trashList')->name('trash');
+        Route::get('restore/{id}', 'restore')->name('restore');
+        Route::get('restoreSelected/{ids}', 'restoreSelected')->name('restoreSelected');
+        Route::delete('permanentDelete/{id}', 'permanentDelete')->name('permanentDelete');
+        Route::delete('permanentDeleteSelected/{ids}', 'permanentDeleteSelected')->name('permanentDeleteSelected');
+        Route::get('alumniImport/create', 'alumniImportCreate')->name('alumniImport.create');
+        Route::post('alumniImport', 'alumniImportStore')->name('alumniImport.store');
+    }
+);
+Route::resource('alumni', 'AlumniController');
+// --/ Routes for Alumni

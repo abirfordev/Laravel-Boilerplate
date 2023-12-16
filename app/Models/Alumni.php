@@ -19,6 +19,7 @@ class Alumni extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
+        'student_id',
         'name',
         'email',
         'password',

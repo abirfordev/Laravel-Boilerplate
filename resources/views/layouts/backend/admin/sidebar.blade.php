@@ -24,6 +24,10 @@
             </a>
         </li>
 
+        <!-- / Dashboards -->
+
+        <!-- User -->
+
         <li class="menu-item {{ request()->is('admin/user*') ? 'active' : '' }}">
             <a href="{{ route('admin.user.index') }}" class="menu-link">
                 <i class="menu-icon fa-solid fa-user"></i>
@@ -31,7 +35,18 @@
             </a>
         </li>
 
-        <!-- / Dashboards -->
+        <!-- / User -->
+
+        <!-- Alumni -->
+
+        <li class="menu-item {{ request()->is('admin/alumni*') ? 'active' : '' }}">
+            <a href="{{ route('admin.alumni.index') }}" class="menu-link">
+                <i class="menu-icon fa-solid fa-user-graduate"></i>
+                <div data-i18n="Alumni">Alumni</div>
+            </a>
+        </li>
+
+        <!-- Alumni -->
 
         <li class="menu-header small text-uppercase"><span class="menu-header-text">Web & Admin Settings</span></li>
         <li class="menu-item {{ request()->is('admin/settings*') ? 'active open' : '' }}">
