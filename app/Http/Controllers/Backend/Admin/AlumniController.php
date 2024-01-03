@@ -5,6 +5,7 @@ namespace App\Http\Controllers\backend\admin;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\AlumniImport;
+use App\Jobs\StoreAlumniData;
 use App\Models\Alumni;
 use Exception;
 use Illuminate\Http\Request;
@@ -188,9 +189,22 @@ class AlumniController extends Controller
                         if ($extension == "xlsx" || $extension == "xls" || $extension == "csv") {
                             if ($request->file('alumni_file')->isValid()) {
 
-                                Excel::import(new AlumniImport(), $request->file('alumni_file'));
+                                $email = 'abirdas422@gmail.com';
+                                $mailData = [
+                                    'title' => 'Successfully Store',
+                                    'message' => 'Your file is successfully imported.'
+                                ];
 
-                                return response()->json(['type' => 'success', 'message' => "Successfully Inserted"]);
+                                $data = [
+                                    'email' => $email,
+                                    'mailData' => $mailData
+                                ];
+
+                                Excel::queueImport(new AlumniImport(), $request->file('alumni_file'))->chain([
+                                    new StoreAlumniData($data),
+                                ]);
+
+                                return response()->json(['type' => 'success', 'message' => "Successfully imported the file. After store all data you will be notify by mail."]);
                             } else {
                                 return response()->json([
                                     'type' => 'error',
